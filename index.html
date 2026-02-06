@@ -1276,11 +1276,30 @@
 
         renderAllRoleUIs();
 
-        // --- TOGGLE LOGIC UPDATED FOR MANDATORY ---
+        // --- TOGGLE LOGIC UPDATED FOR MANDATORY & DISABLED ITEMS ---
         window.toggleAll = function(checked, clearRoles = true) {
             document.querySelectorAll('input[name="permissions"]').forEach(cb => {
-                if(!cb.disabled) cb.checked = checked; // Only toggle enabled ones
+                const id = parseInt(cb.value);
+                const item = menuItems.find(m => m.id === id);
+
+                if (checked) {
+                    // Select All: Check enabled ones.
+                    if (!cb.disabled) cb.checked = true;
+                    
+                    // Also check disabled non-mandatory headers (Main Menus disabled for UX)
+                    if (cb.disabled && item && !item.mandatory && item.type === 'header') {
+                         cb.checked = true;
+                    }
+                } else {
+                    // Clear All: Uncheck everything EXCEPT Mandatory
+                    if (item && item.mandatory) {
+                        cb.checked = true; // Force check mandatory
+                    } else {
+                        cb.checked = false; // Uncheck everything else (even if disabled)
+                    }
+                }
             });
+            
             if(!checked && clearRoles) {
                 document.querySelectorAll('input[name="role"]').forEach(r => r.checked = false);
             }
@@ -1288,13 +1307,40 @@
 
         window.toggleEditAll = function(checked) {
             document.querySelectorAll('input[name="editPermissions"]').forEach(cb => {
-                if(!cb.disabled) cb.checked = checked; 
+                const id = parseInt(cb.value);
+                const item = menuItems.find(m => m.id === id);
+
+                if (checked) {
+                    if (!cb.disabled) cb.checked = true;
+                    if (cb.disabled && item && !item.mandatory && item.type === 'header') {
+                         cb.checked = true;
+                    }
+                } else {
+                    if (item && item.mandatory) {
+                        cb.checked = true;
+                    } else {
+                        cb.checked = false;
+                    }
+                }
             });
         }
 
         window.toggleSettingsAll = function(checked) {
             document.querySelectorAll('input[name="settingsPermissions"]').forEach(cb => {
-                if(!cb.disabled) cb.checked = checked; 
+                const id = parseInt(cb.value);
+                const item = menuItems.find(m => m.id === id);
+
+                if (checked) {
+                    if (!cb.disabled) cb.checked = true;
+                } else {
+                    // Settings modal usually locks mandatory items, so we respect disable state
+                    // But for consistency with clear:
+                    if (item && item.mandatory) {
+                        cb.checked = true;
+                    } else if (!cb.disabled) {
+                        cb.checked = false;
+                    }
+                }
             });
         }
 
