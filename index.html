@@ -775,7 +775,7 @@
             }
         }
 
-        // --- HELPER FOR PERMISSION LOGIC (Fixing cleanPermissions) ---
+        // --- HELPER FOR PERMISSION LOGIC ---
         function cleanPermissions(permissions) {
             let permissionSet = new Set(permissions);
             
@@ -808,49 +808,6 @@
             return Array.from(permissionSet);
         }
 
-        // --- NEW FUNCTION: Auto-select/Deselect Parent based on Child state ---
-        window.handlePermissionChange = function(checkbox) {
-            const id = parseInt(checkbox.value);
-            const item = menuItems.find(m => m.id === id);
-            const groupName = checkbox.name; // permissions, editPermissions, settingsPermissions
-
-            if (item && item.parentId) {
-                // It's a sub menu, handle parent sync
-                const parentId = item.parentId;
-                
-                // Find parent checkbox in the same group
-                const parentCb = document.querySelector(`input[name="${groupName}"][value="${parentId}"]`);
-                
-                if (parentCb) {
-                    const parentItem = menuItems.find(m => m.id === parentId);
-                    
-                    if (checkbox.checked) {
-                        // Case 1: Select Child -> Auto Select Parent
-                        parentCb.checked = true;
-                    } else {
-                        // Case 2: Deselect Child -> Check if any siblings remain checked
-                        if (!parentItem.mandatory) {
-                            const siblings = menuItems.filter(m => m.parentId === parentId);
-                            let anySiblingChecked = false;
-                            
-                            for (const sibling of siblings) {
-                                const siblingCb = document.querySelector(`input[name="${groupName}"][value="${sibling.id}"]`);
-                                if (siblingCb && siblingCb.checked) {
-                                    anySiblingChecked = true;
-                                    break;
-                                }
-                            }
-                            
-                            // If no siblings checked, auto deselect parent
-                            if (!anySiblingChecked) {
-                                parentCb.checked = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         function getCheckboxHTML(item, name) {
             const isMandatory = item.mandatory || false;
             const isHeader = item.type === 'header';
@@ -858,20 +815,26 @@
             
             // Modified Logic: Disable if Mandatory OR if it is a Header (Main Menu)
             let checkedAttr = '';
+            
             if (isMandatory) {
                 checkedAttr = 'checked disabled';
-            } else if (isHeader) {
-                checkedAttr = 'disabled'; // Disable main menu interaction
+            }
+            
+            // Explicitly disable these Main Menus as requested
+            // 23: ยอดรวมรายได้, 24: รายการสั่งซื้อฯ, 28: จัดการข้อมูลร้านค้า, 40: Pay.sn, 47: บริการชำระเงินอัตโนมัติ
+            const disableIds = [23, 24, 28, 40, 47];
+            if (disableIds.includes(item.id)) {
+                checkedAttr += ' disabled'; 
             }
 
-            const cursorClass = (isMandatory || isHeader) ? 'cursor-not-allowed opacity-90' : 'cursor-pointer';
+            const cursorClass = (isMandatory || checkedAttr.includes('disabled')) ? 'cursor-not-allowed opacity-90' : 'cursor-pointer';
             
             let containerClass = "flex items-start gap-2 relative group p-1.5 rounded-md hover:bg-slate-50 transition-colors";
             let textClass = "text-xs text-slate-600 group-hover:text-indigo-700 transition-colors";
             let indentClass = "";
             let icon = "";
 
-            if (isHeader) {
+            if (item.type === 'header') {
                 containerClass += " bg-slate-50/50 border border-slate-100 mb-1";
                 textClass = "text-xs font-bold text-slate-800";
                 if (isMandatory) {
@@ -910,6 +873,49 @@
             orphans.forEach(o => sorted.push(o));
 
             return sorted;
+        }
+
+        // --- NEW FUNCTION: Auto-select/Deselect Parent based on Child state ---
+        window.handlePermissionChange = function(checkbox) {
+            const id = parseInt(checkbox.value);
+            const item = menuItems.find(m => m.id === id);
+            const groupName = checkbox.name; 
+
+            if (item && item.parentId) {
+                // It's a sub menu, handle parent sync
+                const parentId = item.parentId;
+                
+                // Find parent checkbox in the same group
+                const parentCb = document.querySelector(`input[name="${groupName}"][value="${parentId}"]`);
+                
+                if (parentCb) {
+                    const parentItem = menuItems.find(m => m.id === parentId);
+                    
+                    if (checkbox.checked) {
+                        // Case 1: Select Child -> Auto Select Parent
+                        parentCb.checked = true;
+                    } else {
+                        // Case 2: Deselect Child -> Check if any siblings remain checked
+                        if (!parentItem.mandatory) {
+                            const siblings = menuItems.filter(m => m.parentId === parentId);
+                            let anySiblingChecked = false;
+                            
+                            for (const sibling of siblings) {
+                                const siblingCb = document.querySelector(`input[name="${groupName}"][value="${sibling.id}"]`);
+                                if (siblingCb && siblingCb.checked) {
+                                    anySiblingChecked = true;
+                                    break;
+                                }
+                            }
+                            
+                            // If no siblings checked, auto deselect parent
+                            if (!anySiblingChecked) {
+                                parentCb.checked = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         function renderAllPermissionGrids() {
@@ -969,7 +975,16 @@
             { id: 24, name: "รายการสั่งซื้อและผู้ซื้อ", type: 'header', mandatory: false },
             { id: 25, name: "รายการสั่งซื้อทั้งหมด", type: 'item', parentId: 24 },
             { id: 26, name: "คืนเงินหรือยกเลิกรายการ", type: 'item', parentId: 24 },
-            { id: 27, name: "อัตราแลกเปลี่ยน", type: 'item', parentId: 24 }
+            { id: 27, name: "อัตราแลกเปลี่ยน", type: 'item', parentId: 24 },
+            { id: 28, name: "จัดการข้อมูลร้านค้า", type: 'header', mandatory: false },
+            { id: 29, name: "ตั้งค่าเบื้องต้น", type: 'item', parentId: 28 },
+            { id: 30, name: "ข้อมูลส่วนตัว", type: 'item', parentId: 28 },
+            { id: 40, name: "ลิงก์ชำระเงิน (Pay.sn)", type: 'header', mandatory: false },
+            { id: 5278, name: "ลิงก์รับชำระเงินของร้านค้า", type: 'item', parentId: 40 },
+            { id: 5279, name: "ลิงก์รับชำระเงินแบบกำหนดเวลา", type: 'item', parentId: 40 },
+            { id: 47, name: "บริการชำระเงินอัตโนมัติ", type: 'header', mandatory: false },
+            { id: 48, name: "สร้างรายการชำระเงินอัตโนมัติ", type: 'item', parentId: 47 },
+            { id: 49, name: "การชำระเงินอัตโนมัติ", type: 'item', parentId: 47 }
         ];
 
         let menuItems = [...defaultMenuItems];
@@ -2158,8 +2173,13 @@
             }
             window.toggleAll(false, true);
             
-            const dashCheck = document.querySelector('input[name="permissions"][value="15"]');
-            if(dashCheck) dashCheck.checked = true;
+            // Re-apply mandatory checks
+            menuItems.forEach(m => {
+                if(m.mandatory) {
+                    const cb = document.querySelector(`input[name="permissions"][value="${m.id}"]`);
+                    if(cb) cb.checked = true;
+                }
+            });
         }
 
         const userView = document.getElementById('userView');
