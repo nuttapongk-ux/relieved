@@ -9,7 +9,7 @@
     <!-- Google Fonts: Kanit -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS with Custom Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,7 +28,10 @@
                             700: '#002fb3',
                             800: '#00268f',
                             900: '#002075',
-                        }
+                        },
+                        // Colors from the popup image
+                        'popup-btn': '#1F2937', // Dark slate/gray for button
+                        'popup-icon-bg': '#FEE2E2', // Light red for error/warning icon bg
                     }
                 }
             }
@@ -76,20 +79,13 @@
             transform: scale(1);
         }
 
-        .user-card-enter {
-            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .highlight-row {
-            animation: highlightPulse 1.5s ease-out;
-        }
-        @keyframes highlightPulse {
-            0% { background-color: #dce8ff; } 
-            100% { background-color: white; }
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -360,23 +356,25 @@
         </div>
     </div>
 
-    <!-- Duplicate Warning Modal -->
+    <!-- Duplicate Warning Modal (Styled like requested image) -->
     <div id="duplicateWarningModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform transition-all scale-100">
-            <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-2xl"></i>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
+            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <i class="fa-solid fa-xmark text-red-500 text-4xl"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-800 mb-2">พบข้อมูลซ้ำ</h3>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed" id="duplicateWarningMessage">
-                <!-- Message goes here -->
+            
+            <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลผู้ใช้งานซ้ำ</h3>
+            <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+                Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ
             </p>
-            <button onclick="closeDuplicateWarningModal()" class="w-full px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium shadow-md transition-colors">
-                รับทราบ
+            
+            <button onclick="closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
+                ปิดหน้าจอ
             </button>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal (Unified) -->
     <div id="deleteConfirmModal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform transition-all scale-100">
             <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -672,7 +670,7 @@
                             </div>
                         </div>
 
-                        <details class="group bg-white rounded-lg border border-slate-200" open>
+                        <details class="group bg-white rounded-lg border border-slate-200">
                             <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-xs text-slate-600 bg-slate-50 rounded-t-lg group-open:border-b">
                                 <span><i class="fa-solid fa-list-check mr-2 text-brand-500"></i> กำหนดสิทธิ์รายเมนู (Advanced)</span>
                                 <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
@@ -1031,7 +1029,7 @@
 
         // --- UPDATED MENU STRUCTURE ---
         const defaultMenuItems = [
-            { id: 15, name: "แดชบอร์ด", type: 'header', mandatory: true }, // Only Dashboard is Mandatory
+            { id: 15, name: "แดชบอร์ด", type: 'header', mandatory: true }, 
             { id: 23, name: "ยอดรวมรายได้", type: 'header', mandatory: false },
             { id: 41, name: "ประวัติการโอนเงินคืน", type: 'header', mandatory: false },
             { id: 24, name: "รายการสั่งซื้อและผู้ซื้อ", type: 'header', mandatory: false },
@@ -1041,14 +1039,23 @@
             { id: 28, name: "จัดการข้อมูลร้านค้า", type: 'header', mandatory: false },
             { id: 29, name: "ตั้งค่าเบื้องต้น", type: 'item', parentId: 28 },
             { id: 30, name: "ข้อมูลส่วนตัว", type: 'item', parentId: 28 },
+            { id: 31, name: "แก้ไขข้อมูลส่วนตัว", type: 'item', parentId: 28 },
+            { id: 32, name: "แก้ไขข้อมูลบัญชีธนาคาร", type: 'item', parentId: 28 },
+            { id: 33, name: "เปลี่ยนรหัสผ่าน", type: 'item', parentId: 28 },
+            { id: 34, name: "ข้อมูลใบกำกับภาษี", type: 'item', parentId: 28 },
+            { id: 54, name: "ส่งค่ากลับเว็บไซต์หลัก", type: 'item', parentId: 28 },
+            { id: 10753, name: "จัดการเอกสาร", type: 'header', mandatory: false },
             { id: 40, name: "ลิงก์ชำระเงิน (Pay.sn)", type: 'header', mandatory: false },
             { id: 5278, name: "ลิงก์รับชำระเงินของร้านค้า", type: 'item', parentId: 40 },
             { id: 5279, name: "ลิงก์รับชำระเงินแบบกำหนดเวลา", type: 'item', parentId: 40 },
+            { id: 46, name: "เทคนิคการใช้งาน", type: 'header', mandatory: false },
             { id: 47, name: "บริการชำระเงินอัตโนมัติ", type: 'header', mandatory: false },
             { id: 48, name: "สร้างรายการชำระเงินอัตโนมัติ", type: 'item', parentId: 47 },
             { id: 49, name: "การชำระเงินอัตโนมัติ", type: 'item', parentId: 47 },
-            { id: 46, name: "เทคนิคการใช้งาน", type: 'header', mandatory: false },
-            { id: 10031, name: "ข่าวสารและกิจกรรมใหม่", type: 'header', mandatory: false }
+            { id: 9531, name: "เพิ่มโลโก้ชำระเงินบนเว็บไซต์", type: 'header', mandatory: false },
+            { id: 10031, name: "ข่าวสารและกิจกรรมใหม่", type: 'header', mandatory: false },
+            { id: 10032, name: "ดาวน์โหลดใบเสร็จ / ใบกำกับภาษี อิเล็กทรอนิกส์", type: 'header', mandatory: false },
+            { id: 10752, name: "ตัวแทนจำหน่าย", type: 'header', mandatory: false }
         ];
 
         let menuItems = [...defaultMenuItems];
@@ -1184,8 +1191,9 @@
                     <td class="px-4 py-3 text-slate-500">${user.name}</td>
                     <td class="px-4 py-3">${roleBadge}</td>
                     <td class="px-4 py-3 text-right">
-                        <button onclick="editAdminUser('${user.id}')" class="text-indigo-400 hover:bg-indigo-50 p-1.5 rounded transition-colors mr-1"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteItem('${user.id}', 'adminUser')" class="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="editAdminUser('${user.id}')" class="text-brand-600 hover:text-brand-800 text-sm font-medium bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fa-solid fa-eye mr-1"></i> ดูรายละเอียด
+                        </button>
                     </td>
                 `;
                 adminUsersTable.appendChild(tr);
@@ -2429,6 +2437,7 @@
                 
                 html += `<tr><td class="header-col ${indentClass}" style="${style}">${prefix}${item.name}</td>`;
                 
+                // Use cleaned permissions for export as well
                 batchUsers.forEach(u => {
                     const cleanPerms = cleanPermissions(u.permissions || []);
                     const isSelected = cleanPerms.includes(item.id);
