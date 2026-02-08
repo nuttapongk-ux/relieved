@@ -78,13 +78,20 @@
             transform: scale(1);
         }
 
-        /* Modal Animation */
-        .modal-enter {
-            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .user-card-enter {
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes modalPop {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .highlight-row {
+            animation: highlightPulse 1.5s ease-out;
+        }
+        @keyframes highlightPulse {
+            0% { background-color: #e0e7ff; } 
+            100% { background-color: white; }
         }
     </style>
 </head>
@@ -224,7 +231,7 @@
                 <button onclick="closeRoleSettingsModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             
-            <div class="flex-1 overflow-hidden flex flex-col md:flex-row">
+            <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
                 <!-- Role Selector Sidebar -->
                 <div class="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4 shrink-0 flex flex-col">
                     <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">เลือกบทบาท (Select Role)</h4>
@@ -352,24 +359,6 @@
             <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3">
                 <button onclick="closeMenuSettingsModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ปิดหน้าต่าง</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Duplicate Warning Modal -->
-    <div id="duplicateWarningModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
-            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                <i class="fa-solid fa-xmark text-red-500 text-4xl"></i>
-            </div>
-            
-            <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลผู้ใช้งานซ้ำ</h3>
-            <p class="text-slate-500 mb-8 leading-relaxed text-sm">
-                Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ
-            </p>
-            
-            <button onclick="closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
-                ปิดหน้าจอ
-            </button>
         </div>
     </div>
 
@@ -1133,10 +1122,8 @@
             const isDuplicate = userQueue.some(u => u.fullName.toLowerCase() === name.toLowerCase() || u.email.toLowerCase() === email.toLowerCase());
             
             if (isDuplicate) {
-                // Show Custom Modal
                 document.getElementById('duplicateWarningModal').classList.remove('hidden');
                 
-                // Highlight input
                 nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
                 nameInput.addEventListener('input', function() {
                     this.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
@@ -1180,9 +1167,6 @@
             });
         }
         
-        // ... (Other window functions for brevity: removeFromQueue, editQueueItem, renderQueue, confirmSubmission, resetAll, searchRequests, open/close modals, etc.)
-        // Ensure all are attached to window similar to addToQueue above.
-
         window.removeFromQueue = function(tempId) {
             userQueue = userQueue.filter(u => u.tempId !== tempId);
             renderQueue();
