@@ -16,14 +16,14 @@
             theme: {
                 extend: {
                     colors: {
-                        // Custom Brand Color #004BFF
+                        // Custom Brand Color #004BFF generated palette
                         brand: {
                             50: '#eef4ff',
                             100: '#dce8ff',
                             200: '#b0ccff',
                             300: '#7aa8ff',
                             400: '#3d7aff',
-                            500: '#004BFF',
+                            500: '#004BFF', // Main Brand Color
                             600: '#003ce6',
                             700: '#002fb3',
                             800: '#00268f',
@@ -41,22 +41,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Kanit', sans-serif; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7c7c7; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
-        .custom-checkbox:checked + div { background-color: #eff6ff; border-color: #003ce6; color: #002fb3; }
-        .custom-checkbox:checked + div .check-icon { opacity: 1; transform: scale(1); }
+        /* Checkbox Custom Style */
+        .custom-checkbox:checked + div {
+            background-color: #eff6ff;
+            border-color: #003ce6;
+            color: #002fb3;
+        }
+        .custom-checkbox:checked + div .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-        .user-card-enter { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .highlight-row { animation: highlightPulse 1.5s ease-out; }
-        @keyframes highlightPulse { 0% { background-color: #dce8ff; } 100% { background-color: white; } }
+        /* Modal Animation */
+        .modal-enter {
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-4">
@@ -195,7 +224,7 @@
     <!-- Duplicate Warning Modal -->
     <div id="duplicateWarningModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
-            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm"><i class="fa-solid fa-xmark text-red-500 text-4xl"></i></div>
+            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-xmark text-red-500 text-4xl"></i></div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลซ้ำ</h3>
             <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
             <button onclick="window.closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ปิดหน้าจอ</button>
@@ -319,7 +348,7 @@
                     <div class="text-sm text-slate-500 hidden sm:block">รอส่งทั้งหมด <span id="footerCount" class="font-bold text-slate-800">0</span> รายการ</div>
                     <div class="flex items-center gap-3 w-full sm:w-auto">
                         <button type="button" onclick="window.resetAll()" class="px-4 py-2.5 border border-slate-300 text-slate-600 font-medium rounded-lg hover:bg-slate-50 transition-colors bg-white flex-1 sm:flex-none">ล้างทั้งหมด</button>
-                        <button type="submit" onclick="window.openPreviewModal()" id="submitAllBtn" disabled class="flex-1 sm:flex-none bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-brand-200 transition-all flex justify-center items-center gap-2"><span>ยืนยันทั้งหมด</span> <i class="fa-solid fa-paper-plane text-sm"></i></button>
+                        <button type="submit" onclick="window.confirmSubmission()" id="submitAllBtn" disabled class="flex-1 sm:flex-none bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-brand-200 transition-all flex justify-center items-center gap-2"><span>ยืนยันทั้งหมด</span> <i class="fa-solid fa-paper-plane text-sm"></i></button>
                     </div>
                 </div>
             </div>
@@ -822,6 +851,7 @@
         window.saveRoleSettings = function() {
              const checkboxes = document.querySelectorAll('input[name="settingsPermissions"]:checked');
              let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+             // Ensure mandatory
              menuItems.forEach(m => { if(m.mandatory && !selectedIds.includes(m.id)) selectedIds.push(m.id); });
              
              if(selectedIds.length === menuItems.length) rolePermissions[currentSettingsRole] = 'all';
