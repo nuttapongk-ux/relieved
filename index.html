@@ -139,11 +139,6 @@
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg shadow-lg shadow-slate-200 transition-all active:scale-[0.98] mt-2">
                     เข้าสู่ระบบ
                 </button>
-                <div class="text-center mt-4 space-y-1">
-                    <span class="text-[10px] text-slate-400 block">Default Login (หากยังไม่สร้าง user):</span>
-                    <div class="text-[10px] text-slate-400">Admin: admin / 1234</div>
-                    <div class="text-[10px] text-slate-400">Sale: sale / 1234</div>
-                </div>
             </form>
         </div>
     </div>
@@ -228,7 +223,7 @@
                     <div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-user-tag text-xl"></i></div>
                     <div>
                         <h3 class="font-bold text-lg">จัดการบทบาท (Role Management)</h3>
-                        <p class="text-xs text-slate-400">กำหนดเมนูเริ่มต้นและคำอธิบายสำหรับแต่ละบทบาท</p>
+                        <p class="text-xs text-slate-400">กำหนดเมนูเริ่มต้นสำหรับแต่ละบทบาท</p>
                     </div>
                 </div>
                 <button onclick="closeRoleSettingsModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
@@ -246,8 +241,8 @@
                     <div class="mt-4 pt-4 border-t border-slate-200">
                         <label class="text-[10px] text-slate-400 font-bold uppercase mb-2 block">เพิ่มบทบาทใหม่ (New Role)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="newRoleNameInput" placeholder="ระบุชื่อ Role..." class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
-                            <button onclick="addNewRole()" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-indigo-700 transition-colors shadow-sm">
+                            <input type="text" id="newRoleNameInput" placeholder="ระบุชื่อ Role..." class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                            <button onclick="addNewRole()" class="bg-brand-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-brand-700 transition-colors shadow-sm">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -259,7 +254,7 @@
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
                         <h4 class="text-sm font-bold text-slate-800" id="currentRoleTitle">Editing: Manager</h4>
                         <div class="flex gap-2">
-                            <button type="button" onclick="toggleSettingsAll(true)" class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100">เลือกทั้งหมด</button>
+                            <button type="button" onclick="toggleSettingsAll(true)" class="text-xs text-brand-600 bg-brand-50 px-2 py-1 rounded hover:bg-brand-100">เลือกทั้งหมด</button>
                             <button type="button" onclick="toggleSettingsAll(false)" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded hover:bg-slate-200">ล้าง</button>
                         </div>
                     </div>
@@ -269,7 +264,7 @@
                         <label class="block text-xs font-bold text-slate-600 mb-2">
                             <i class="fa-solid fa-align-left mr-1"></i> คำอธิบายบทบาท (Description)
                         </label>
-                        <textarea id="roleDescriptionInput" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-md focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none text-slate-600" placeholder="ระบุรายละเอียดหน้าที่ความรับผิดชอบ หรือสิทธิ์การใช้งาน..."></textarea>
+                        <textarea id="roleDescriptionInput" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-md focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none resize-none text-slate-600" placeholder="ระบุรายละเอียดหน้าที่ความรับผิดชอบ หรือสิทธิ์การใช้งาน..."></textarea>
                         <div class="text-[10px] text-slate-400 mt-1 text-right">ข้อความนี้จะแสดงเมื่อผู้ใช้เลือกบทบาทในหน้าฟอร์ม</div>
                     </div>
 
@@ -281,7 +276,7 @@
 
             <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3">
                 <button onclick="closeRoleSettingsModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ปิดหน้าต่าง</button>
-                <button id="btnSaveRoleSettings" onclick="saveRoleSettings()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
+                <button id="btnSaveRoleSettings" onclick="saveRoleSettings()" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2">
                     <i class="fa-solid fa-save"></i> บันทึกค่าเริ่มต้น
                 </button>
             </div>
@@ -606,7 +601,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label>
-                                <input type="text" name="merchantId" required placeholder="M-xxxxxx" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm">
+                                <input type="text" name="merchantId" required placeholder="กรุณากรอก Merchant ID" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อร้านค้า</label>
@@ -645,7 +640,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-                                <input type="email" id="inputEmail" placeholder="email@ex.com" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white">
+                                <input type="email" id="inputEmail" placeholder="email@email.com" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white">
                             </div>
                         </div>
                         
@@ -799,7 +794,6 @@
         async function saveRolesToFirebase() {
             try {
                 const rolesDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings_roles', 'default');
-                // Save both roles and descriptions
                 await setDoc(rolesDocRef, { 
                     roles: rolePermissions,
                     descriptions: roleDescriptions 
@@ -1004,12 +998,7 @@
         let adminUsersList = []; 
 
         // REMOVED: Auto Login from LocalStorage
-
-        // Default Admin Users (Seed if empty)
-        const defaultAdminUsers = [
-            { username: 'admin', password: '1234', role: 'admin', name: 'Super Admin' },
-            { username: 'sale', password: '1234', role: 'sale', name: 'Sale Team' }
-        ];
+        // REMOVED: Default Admin Users (Mockup Removed)
 
         // --- UPDATED MENU STRUCTURE ---
         const defaultMenuItems = [
@@ -1147,20 +1136,16 @@
                     }
                 });
 
-                // 4. Admin Users (Listener + Seeding)
+                // 4. Admin Users (Listener)
                 const usersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
                 onSnapshot(usersColRef, (snapshot) => {
-                    if (snapshot.empty) {
-                        // Seed Default Users
-                        defaultAdminUsers.forEach(u => addDoc(usersColRef, u));
-                    } else {
-                        adminUsersList = [];
-                        snapshot.forEach(doc => {
-                            adminUsersList.push({ id: doc.id, ...doc.data() });
-                        });
-                        if(!adminUsersModal.classList.contains('hidden')) {
-                            renderAdminUsersTable();
-                        }
+                    // Removed: Seeding Logic for Default Users
+                    adminUsersList = [];
+                    snapshot.forEach(doc => {
+                        adminUsersList.push({ id: doc.id, ...doc.data() });
+                    });
+                    if(!adminUsersModal.classList.contains('hidden')) {
+                        renderAdminUsersTable();
                     }
                 });
             }
@@ -1918,6 +1903,32 @@
             window.closeDeleteConfirmModal();
         }
 
+        function executeDeleteMenu(menuId) {
+            menuItems = menuItems.filter(m => m.id !== menuId);
+            
+            Object.keys(rolePermissions).forEach(key => {
+                 if (Array.isArray(rolePermissions[key])) {
+                     rolePermissions[key] = rolePermissions[key].filter(id => id !== menuId);
+                 }
+            });
+            saveRolesToFirebase(); 
+            saveMenusToFirebase(); 
+            
+            window.closeDeleteConfirmModal();
+        }
+
+        function executeDeleteAdminUser(userId) {
+            deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', userId))
+                .then(() => {
+                     window.closeDeleteConfirmModal();
+                })
+                .catch(err => {
+                    console.error("Error deleting user:", err);
+                    alert("ไม่สามารถลบผู้ใช้งานได้");
+                });
+        }
+
+        // --- OLDER LOGIC ---
         window.saveRoleSettings = function() {
             if(!currentSettingsRole || !rolePermissions[currentSettingsRole]) {
                 alert("กรุณาเลือกหรือสร้าง Role ก่อนบันทึก");
@@ -2235,6 +2246,9 @@
 
             // Use Promise.all to add requests in parallel
             const promises = userQueue.map(u => {
+                // Apply permission cleaning logic here before saving
+                const cleanedPermissions = cleanPermissions(u.permissions);
+
                 const req = {
                     batchId: batchId,
                     date: new Date().toLocaleDateString('th-TH'),
@@ -2243,8 +2257,8 @@
                     fullName: u.fullName,
                     email: u.email,
                     role: u.role,
-                    permissionCount: u.permissionCount,
-                    permissions: u.permissions,
+                    permissionCount: cleanedPermissions.length,
+                    permissions: cleanedPermissions, // Use cleaned permissions
                     status: 'pending',
                     createdAt: serverTimestamp()
                 };
@@ -2373,7 +2387,7 @@
             const u = document.getElementById('loginUsername').value;
             const p = document.getElementById('loginPassword').value;
             
-            // 1. Check DB first
+            // Check DB ONLY
             const dbUser = adminUsersList.find(user => user.username === u && user.password === p);
 
             if (dbUser) {
@@ -2381,12 +2395,7 @@
                 return;
             }
 
-            // 2. Fallback to hardcoded defaults (if DB empty or failed)
-            const defaultUser = defaultAdminUsers.find(user => user.username === u && user.password === p);
-            if (defaultUser) {
-                loginSuccess(defaultUser);
-                return;
-            }
+            // Removed: Fallback to hardcoded defaults
 
             // Failed
             document.getElementById('loginError').classList.remove('hidden');
@@ -2755,12 +2764,6 @@
             // Sort items for Excel report hierarchy
             const displayItems = getSortedMenuItems();
 
-            // Pre-process users to apply cleanPermissions logic (No Sub = No Main)
-            const processedUsers = batchUsers.map(u => ({
-                ...u,
-                permissions: cleanPermissions(u.permissions || [])
-            }));
-
             let html = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
@@ -2797,54 +2800,50 @@
                 <body>
                     <table>
                         <tr>
-                            <td colspan="${processedUsers.length + 1}" class="header-main">
+                            <td colspan="${batchUsers.length + 1}" class="header-main">
                                 Merchant User Request Report
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Batch ID</td>
-                            <td colspan="${processedUsers.length}" class="value" style="mso-number-format:'\@'">${first.batchId}</td>
+                            <td colspan="${batchUsers.length}" class="value" style="mso-number-format:'\@'">${first.batchId}</td>
                         </tr>
                         <tr>
                             <td class="label">Date</td>
-                            <td colspan="${processedUsers.length}" class="value">${first.date}</td>
+                            <td colspan="${batchUsers.length}" class="value">${first.date}</td>
                         </tr>
                         <tr>
                             <td class="label">Merchant</td>
-                            <td colspan="${processedUsers.length}" class="value" style="font-weight:bold;">[${first.merchantId}] ${first.merchantName}</td>
+                            <td colspan="${batchUsers.length}" class="value" style="font-weight:bold;">[${first.merchantId}] ${first.merchantName}</td>
                         </tr>
                         <tr>
                             <td class="label">Total Users</td>
-                            <td colspan="${processedUsers.length}" class="value">${processedUsers.length} Persons</td>
+                            <td colspan="${batchUsers.length}" class="value">${batchUsers.length} Persons</td>
                         </tr>
-                        <tr style="height: 20px;"><td colspan="${processedUsers.length + 1}"></td></tr>
+                        <tr style="height: 20px;"><td colspan="${batchUsers.length + 1}"></td></tr>
                         
                         <tr class="header-section">
                             <td class="text-center">User Information</td>
-                            ${processedUsers.map((u, i) => `<td class="text-center" style="width:150px;">User ${i + 1}</td>`).join('')}
+                            ${batchUsers.map((u, i) => `<td class="text-center" style="width:150px;">User ${i + 1}</td>`).join('')}
                         </tr>
                         <tr>
                             <td class="label">Full Name</td>
-                            ${processedUsers.map(u => `<td>${u.fullName}</td>`).join('')}
+                            ${batchUsers.map(u => `<td>${u.fullName}</td>`).join('')}
                         </tr>
                         <tr>
                             <td class="label">Role</td>
-                            ${processedUsers.map(u => `<td>${u.role}</td>`).join('')}
+                            ${batchUsers.map(u => `<td>${u.role}</td>`).join('')}
                         </tr>
                         <tr>
                             <td class="label">Email</td>
-                            ${processedUsers.map(u => `<td>${u.email}</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="label">Phone</td>
-                            ${processedUsers.map(u => `<td style="mso-number-format:'\@'">${u.phone || '-'}</td>`).join('')}
+                            ${batchUsers.map(u => `<td>${u.email}</td>`).join('')}
                         </tr>
                         
-                        <tr style="height: 20px;"><td colspan="${processedUsers.length + 1}"></td></tr>
+                        <tr style="height: 20px;"><td colspan="${batchUsers.length + 1}"></td></tr>
 
                         <tr class="header-section">
                             <td>Permissions Matrix (${displayItems.length} Menus)</td>
-                            ${processedUsers.map(u => `<td class="text-center">${u.fullName}</td>`).join('')}
+                            ${batchUsers.map(u => `<td class="text-center">${u.fullName}</td>`).join('')}
                         </tr>
             `;
 
@@ -2855,8 +2854,10 @@
                 
                 html += `<tr><td class="header-col ${indentClass}" style="${style}">${prefix}${item.name}</td>`;
                 
-                processedUsers.forEach(u => {
-                    const isSelected = u.permissions.includes(item.id);
+                // Use cleaned permissions for export as well
+                batchUsers.forEach(u => {
+                    const cleanPerms = cleanPermissions(u.permissions || []);
+                    const isSelected = cleanPerms.includes(item.id);
                     if (isSelected) {
                         html += `<td class="check-yes">1</td>`;
                     } else {
