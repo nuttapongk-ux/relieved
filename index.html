@@ -225,7 +225,7 @@
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
             <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-xmark text-red-500 text-4xl"></i></div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลซ้ำ</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
             <button onclick="window.closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ปิดหน้าจอ</button>
         </div>
     </div>
@@ -234,7 +234,7 @@
     <div id="validationModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
             <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-circle-exclamation text-orange-500 text-4xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อมูลไม่ครบถ้วน</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อมูลไม่ถูกต้อง</h3>
             <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="validationMessage">กรุณากรอกข้อมูลให้ครบถ้วน</p>
             <button onclick="window.closeValidationModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ตกลง</button>
         </div>
@@ -670,6 +670,7 @@
             document.getElementById('roleSettingsModal').classList.add('hidden');
         }
 
+        // --- MISSING MENU FUNCTIONS ADDED HERE ---
         window.openMenuSettingsModal = function() {
             document.getElementById('menuSettingsModal').classList.remove('hidden');
             window.updateParentOptions(); 
@@ -703,12 +704,9 @@
             
             const parentSelect = document.getElementById('newMenuParent');
             if(parentSelect && parentSelect.value) {
-                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
-                // Let's assume sub-menus can be mandatory too.
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             } else {
-                // If main menu
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             }
@@ -1167,20 +1165,30 @@
              if(!merchantId) { window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)'); return; }
              if(!name || !email) { window.showValidationModal('กรุณากรอกข้อมูลผู้ใช้งานให้ครบถ้วน<br>(Username และ อีเมล)'); return; }
              
-             const duplicateName = userQueue.some(u => u.fullName.toLowerCase() === name.toLowerCase());
-             const duplicateEmail = userQueue.some(u => u.email.toLowerCase() === email.toLowerCase());
+             // 1. Email Format Check
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                window.showValidationModal('รูปแบบอีเมลไม่ถูกต้อง (เช่น example@domain.com)');
+                emailInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                emailInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
+                return;
+            }
 
-             if (duplicateName || duplicateEmail) {
+            // 2. Username No Thai Check
+            const thaiPattern = /[ก-๙]/;
+            if (thaiPattern.test(name)) {
+                window.showValidationModal('Username ห้ามกรอกภาษาไทย');
+                nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                nameInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
+                return;
+            }
+             
+             const duplicateName = userQueue.some(u => u.fullName.toLowerCase() === name.toLowerCase());
+
+             if (duplicateName) {
                  document.getElementById('duplicateWarningModal').classList.remove('hidden');
-                 
-                 if(duplicateName) {
-                    nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                    nameInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                 }
-                 if(duplicateEmail) {
-                    emailInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                    emailInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                 }
+                 nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                 nameInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
                  return;
              }
 
