@@ -322,15 +322,7 @@
         <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
             <!-- Sidebar -->
             <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10">
-                    <div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div>
-                    <h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2>
-                    <p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p>
-                    <div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500">
-                        <div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div>
-                        <div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">คน</span></div>
-                    </div>
-                </div>
+                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">คน</span></div></div></div>
             </div>
             <!-- Form -->
             <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
@@ -445,7 +437,7 @@
         ];
         let userQueue = [], requests = [], adminUsersList = [], currentModalBatchId = null, editingMenuId = null, currentSettingsRole = 'Manager', editingRoleKey = null, itemToDelete = null, deleteType = null, isAdminLoggedIn = false, currentUserRole = null;
 
-        // --- Functions ---
+        // --- CORE FUNCTIONS (Defined early) ---
         function getSortedMenuItems() {
             const headers = menuItems.filter(m => m.type === 'header').sort((a,b) => a.id - b.id);
             const items = menuItems.filter(m => m.type !== 'header');
@@ -497,7 +489,7 @@
             return `<div class="${indentClass}"><label class="${containerClass} ${cursorClass}"><input type="checkbox" name="${name}" value="${item.id}" onchange="window.handlePermissionChange(this)" class="mt-0.5 custom-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500" ${checkedAttr}><span class="${textClass}">${item.name}${icon}</span></label></div>`;
         }
 
-        // --- GLOBAL WINDOW FUNCTIONS ---
+        // --- WINDOW FUNCTIONS (Assigned to window for global access) ---
         // Render Functions
         window.renderRoleRadios = function(containerId, inputName, onChangeFunctionStr) {
             const container = document.getElementById(containerId);
@@ -676,7 +668,6 @@
             document.getElementById('roleSettingsModal').classList.add('hidden');
         }
 
-        // --- Missing Menu Functions Added ---
         window.openMenuSettingsModal = function() {
             document.getElementById('menuSettingsModal').classList.remove('hidden');
             window.updateParentOptions(); 
@@ -687,126 +678,6 @@
             document.getElementById('menuSettingsModal').classList.add('hidden');
             editingMenuId = null;
         }
-
-        window.updateParentOptions = function(selectedId = null) {
-            const select = document.getElementById('newMenuParent');
-            if(!select) return;
-            select.innerHTML = '<option value="">- เป็นเมนูหลัก -</option>';
-            const headers = menuItems.filter(m => m.type === 'header').sort((a,b) => a.id - b.id);
-            headers.forEach(h => {
-                const option = document.createElement('option');
-                option.value = h.id;
-                option.textContent = h.name;
-                if(selectedId && h.id == selectedId) option.selected = true;
-                select.appendChild(option);
-            });
-            window.toggleMandatoryCheck();
-        }
-
-        window.toggleMandatoryCheck = function() {
-            const mandatoryCheck = document.getElementById('newMenuMandatory');
-            const mandatoryContainer = document.getElementById('newMenuMandatoryContainer');
-            if(!mandatoryCheck || !mandatoryContainer) return;
-            // Logic for mandatory check
-        }
-
-        window.renderMenuManagerTable = function() {
-            const tbody = document.getElementById('menuManagerTable');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const displayItems = getSortedMenuItems();
-            displayItems.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0";
-                
-                if (item.id === editingMenuId) {
-                    // Edit mode
-                    tr.classList.add('bg-brand-50');
-                    let parentOptions = '<option value="">- เมนูหลัก -</option>';
-                    menuItems.filter(m => m.type === 'header' && m.id !== item.id).forEach(h => {
-                        const sel = item.parentId === h.id ? 'selected' : '';
-                        parentOptions += `<option value="${h.id}" ${sel}>${h.name}</option>`;
-                    });
-                    
-                    tr.innerHTML = `
-                        <td class="px-4 py-3"><input type="number" id="editMenuIdInput-${item.id}" value="${item.id}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none text-center bg-white text-slate-700" disabled></td>
-                        <td class="px-4 py-3"><input type="text" id="editMenuNameInput-${item.id}" value="${item.name}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none"></td>
-                        <td class="px-4 py-3"><select id="editMenuParentInput-${item.id}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none">${parentOptions}</select></td>
-                        <td class="px-4 py-3 text-center"><input type="checkbox" id="editMenuMandatoryInput-${item.id}" ${item.mandatory ? 'checked' : ''} class="w-4 h-4 text-brand-600 rounded"></td>
-                        <td class="px-4 py-3 text-right"><button onclick="window.saveEditedMenu(${item.id})" class="text-white bg-green-500 hover:bg-green-600 p-1.5 rounded mr-1 shadow-sm"><i class="fa-solid fa-check"></i></button><button onclick="window.cancelEditMenu()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded"><i class="fa-solid fa-xmark"></i></button></td>
-                    `;
-                } else {
-                    // View mode
-                    const parentName = item.parentId ? (menuItems.find(m => m.id === item.parentId)?.name || '-') : '<span class="text-brand-400 font-bold">Main</span>';
-                    const nameStyle = item.type === 'header' ? "font-bold text-slate-800" : "text-slate-600 pl-4 border-l-2 border-brand-100 ml-2";
-                    
-                    tr.innerHTML = `
-                        <td class="px-4 py-3 text-center text-slate-500 text-xs font-mono">${item.id}</td>
-                        <td class="px-4 py-3"><span class="${nameStyle}">${item.name}</span></td>
-                        <td class="px-4 py-3 text-xs text-slate-500">${parentName}</td>
-                        <td class="px-4 py-3 text-center">${item.mandatory ? '<span class="text-emerald-500"><i class="fa-solid fa-check"></i></span>' : '-'}</td>
-                        <td class="px-4 py-3 text-right"><button onclick="window.startEditMenu(${item.id})" class="text-brand-400 hover:bg-brand-50 p-1.5 rounded transition-colors mr-1"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteItem(${item.id}, 'menu')" class="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"><i class="fa-solid fa-trash-can"></i></button></td>
-                    `;
-                }
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.addNewMenu = function() {
-            const idInput = document.getElementById('newMenuId');
-            const nameInput = document.getElementById('newMenuName');
-            const parentSelect = document.getElementById('newMenuParent');
-            const mandatoryInput = document.getElementById('newMenuMandatory');
-            
-            const name = nameInput.value.trim();
-            if (!name) { alert("กรุณาระบุชื่อเมนู"); return; }
-            
-            let newId = parseInt(idInput.value);
-            if (!newId) newId = menuItems.length > 0 ? Math.max(...menuItems.map(m => m.id)) + 1 : 1;
-            
-            const parentId = parentSelect.value ? parseInt(parentSelect.value) : null;
-            const type = parentId ? 'item' : 'header';
-            
-            menuItems.push({ id: newId, name: name, type: type, parentId: parentId, mandatory: mandatoryInput.checked });
-            window.saveMenusToFirebase();
-            
-            nameInput.value = '';
-            idInput.value = '';
-            mandatoryInput.checked = false;
-            window.updateParentOptions();
-            window.renderMenuManagerTable();
-        }
-
-        window.startEditMenu = function(id) {
-            editingMenuId = id;
-            window.renderMenuManagerTable();
-        }
-
-        window.cancelEditMenu = function() {
-            editingMenuId = null;
-            window.renderMenuManagerTable();
-        }
-
-        window.saveEditedMenu = function(originalId) {
-            const nameInput = document.getElementById(`editMenuNameInput-${originalId}`);
-            const parentInput = document.getElementById(`editMenuParentInput-${originalId}`);
-            const mandatoryInput = document.getElementById(`editMenuMandatoryInput-${originalId}`);
-            
-            if(!nameInput) return;
-            
-            const index = menuItems.findIndex(m => m.id === originalId);
-            if(index !== -1) {
-                menuItems[index].name = nameInput.value.trim();
-                menuItems[index].parentId = parentInput.value ? parseInt(parentInput.value) : null;
-                menuItems[index].type = menuItems[index].parentId ? 'item' : 'header';
-                menuItems[index].mandatory = mandatoryInput.checked;
-                
-                window.saveMenusToFirebase();
-                editingMenuId = null;
-                window.renderMenuManagerTable();
-            }
-        }
-        // ------------------------------------
 
         window.saveAdminUser = async function(e) {
             e.preventDefault();
@@ -1371,7 +1242,6 @@
         window.closeValidationModal = function() { document.getElementById('validationModal').classList.add('hidden'); }
         window.showValidationModal = function(msg) { document.getElementById('validationMessage').innerHTML = msg; document.getElementById('validationModal').classList.remove('hidden'); }
         
-        // --- ADDED MISSING FUNCTIONS FOR DETAIL MODAL ---
         window.updateUserStatus = function(id, newStatus, currentBatchId) {
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), {
                 status: newStatus
@@ -1380,55 +1250,136 @@
             });
         };
         
+        // --- ADDED MISSING DISPLAY HELPER FUNCTIONS ---
         window.getPermissionNamesHTML = function(permissionIds) {
             const selectedIds = permissionIds || [];
             let html = '<div class="flex flex-col gap-0">';
+            
             const displayItems = getSortedMenuItems();
+
             displayItems.forEach((item, index) => {
                 const isSelected = selectedIds.includes(item.id);
                 const value = isSelected ? 1 : 0;
                 const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                
                 let nameStyle = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400';
                 let indentStyle = '';
-                if (item.type === 'header') { nameStyle += ' font-bold'; } else if (item.parentId) { indentStyle = 'pl-4 border-l-2 border-slate-100 ml-1'; }
+                
+                if (item.type === 'header') {
+                    nameStyle += ' font-bold';
+                } else if (item.parentId) {
+                    indentStyle = 'pl-4 border-l-2 border-slate-100 ml-1';
+                }
+
                 const valClass = isSelected ? 'text-green-600 font-bold' : 'text-slate-300';
-                html += ` <div class="flex justify-between items-center py-1 px-2 ${bgClass} border-b border-slate-100 last:border-0 text-[11px]"> <span class="${nameStyle} ${indentStyle}">${item.name}</span> <span class="${valClass}">${value}</span> </div> `;
+                
+                html += `
+                    <div class="flex justify-between items-center py-1 px-2 ${bgClass} border-b border-slate-100 last:border-0 text-[11px]">
+                        <span class="${nameStyle} ${indentStyle}">${item.name}</span>
+                        <span class="${valClass}">${value}</span>
+                    </div>
+                `;
             });
             html += '</div>';
             return html;
         }
-
+        
         window.openDetailModal = function(batchId) {
             currentModalBatchId = batchId;
             const batchUsers = requests.filter(r => r.batchId === batchId);
             if(batchUsers.length === 0) return;
+
             const first = batchUsers[0];
             document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
             document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${first.date}`;
+
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b border-slate-100 align-top';
+
                 let statusBadge = '';
                 let actions = '';
+                
                 if (currentUserRole === 'sale') {
-                     if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`; actions = `<span class="text-xs text-slate-400 italic">View Only</span>`; } else if (u.status === 'approved') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`; actions = `<span class="text-xs text-green-600">Approved</span>`; } else { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`; actions = `<span class="text-xs text-red-600">Rejected</span>`; }
+                     if (u.status === 'pending') {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`;
+                        actions = `<span class="text-xs text-slate-400 italic">View Only</span>`;
+                    } else if (u.status === 'approved') {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`;
+                        actions = `<span class="text-xs text-green-600">Approved</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`;
+                        actions = `<span class="text-xs text-red-600">Rejected</span>`;
+                    }
                 } else {
-                    if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`; actions = ` <button onclick="window.editUser('${u.id}')" class="p-2 text-brand-600 hover:bg-brand-50 rounded" title="แก้ไข"><i class="fa-solid fa-pen"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'approved', '${batchId}')" class="p-2 text-green-600 hover:bg-green-50 rounded" title="อนุมัติ"><i class="fa-solid fa-check"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'rejected', '${batchId}')" class="p-2 text-red-600 hover:bg-red-50 rounded" title="ปฏิเสธ"><i class="fa-solid fa-xmark"></i></button> `; } else if (u.status === 'approved') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`; actions = `<span class="text-xs text-slate-300">Success</span>`; } else { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`; actions = `<span class="text-xs text-slate-300">Rejected</span>`; }
+                    if (u.status === 'pending') {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`;
+                        actions = `
+                            <button onclick="window.editUser('${u.id}')" class="p-2 text-brand-600 hover:bg-brand-50 rounded" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="window.updateUserStatus('${u.id}', 'approved', '${batchId}')" class="p-2 text-green-600 hover:bg-green-50 rounded" title="อนุมัติ"><i class="fa-solid fa-check"></i></button>
+                            <button onclick="window.updateUserStatus('${u.id}', 'rejected', '${batchId}')" class="p-2 text-red-600 hover:bg-red-50 rounded" title="ปฏิเสธ"><i class="fa-solid fa-xmark"></i></button>
+                        `;
+                    } else if (u.status === 'approved') {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`;
+                        actions = `<span class="text-xs text-slate-300">Success</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`;
+                        actions = `<span class="text-xs text-slate-300">Rejected</span>`;
+                    }
                 }
+
                 let roleColor = "bg-slate-100 text-slate-600";
                 if(u.role === 'Manager') roleColor = "bg-brand-50 text-brand-700 border border-brand-100";
+
                 const permListHTML = window.getPermissionNamesHTML(u.permissions);
-                tr.innerHTML = ` <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end gap-1">${actions}</div> </td> `; modalTableBody.appendChild(tr);
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-medium text-slate-800">${u.fullName}</div>
+                        <div class="text-xs text-slate-500">${u.email}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col items-start gap-1">
+                            <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span>
+                            <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button>
+                            <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all">
+                                ${permListHTML}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        ${statusBadge}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-1">${actions}</div>
+                    </td>
+                `;
+                modalTableBody.appendChild(tr);
             });
+
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        window.closeDetailModal = function() { document.getElementById('detailModal').classList.add('hidden'); currentModalBatchId = null; }
-        window.togglePerms = function(id) { const el = document.getElementById(`perm-list-${id}`); if (el.classList.contains('hidden')) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); } }
-        
-        // --- UPDATED EXPORT FUNCTION (MATRIX FORMAT) ---
+        window.closeDetailModal = function() {
+            document.getElementById('detailModal').classList.add('hidden');
+            currentModalBatchId = null;
+        }
+
+        window.togglePerms = function(id) {
+            const el = document.getElementById(`perm-list-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // --- EXPORT FUNCTION (MATRIX FORMAT) ---
         window.exportBatchExcel = function() {
             if (!currentModalBatchId) return;
             const batchUsers = requests.filter(r => r.batchId === currentModalBatchId);
@@ -1519,6 +1470,10 @@
                  onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'admin_users'), (snap) => {
                      adminUsersList = [];
                      snap.forEach(d => adminUsersList.push({id: d.id, ...d.data()}));
+                     // 1. Force table re-render when data updates!
+                     if(typeof window.renderAdminUsersTable === 'function') {
+                         window.renderAdminUsersTable();
+                     }
                      // Create default admin if empty
                      if(adminUsersList.length === 0) {
                          const defaultAdmin = { username: 'admin', password: '1234', name: 'System Admin', role: 'admin' };
