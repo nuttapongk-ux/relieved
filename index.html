@@ -330,7 +330,7 @@
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 sticky top-0 z-20 shadow-sm">
                          <h4 class="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-shop text-brand-500"></i> ข้อมูลร้านค้า (ใช้ร่วมกัน)</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label><input type="text" name="merchantId" required placeholder="M-xxxxxx" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm"></div>
+                            <div><label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label><input type="text" name="merchantId" required placeholder="ระบุตัวเลข (สูงสุด 5 หลัก)" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" inputmode="numeric" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">ชื่อร้านค้า</label><input type="text" name="merchantName" placeholder="ระบุชื่อร้านค้า" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                         </div>
                     </div>
@@ -670,7 +670,6 @@
             document.getElementById('roleSettingsModal').classList.add('hidden');
         }
 
-        // --- MISSING MENU FUNCTIONS ADDED HERE ---
         window.openMenuSettingsModal = function() {
             document.getElementById('menuSettingsModal').classList.remove('hidden');
             window.updateParentOptions(); 
@@ -1146,6 +1145,10 @@
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginError').classList.add('hidden');
 
+            // Clear search input
+            const searchInput = document.getElementById('adminSearchInput');
+            if(searchInput) searchInput.value = '';
+
             window.toggleView('user');
         }
 
@@ -1220,6 +1223,12 @@
             window.renderQueue(); 
             window.toggleAll(false, true); 
             
+            // Clear Merchant Inputs
+            const merchantIdInput = document.querySelector('input[name="merchantId"]');
+            const merchantNameInput = document.querySelector('input[name="merchantName"]');
+            if (merchantIdInput) merchantIdInput.value = '';
+            if (merchantNameInput) merchantNameInput.value = '';
+
             // Explicitly hide success modal
             const successMessageEl = document.getElementById('successMessage');
             if(successMessageEl) {
