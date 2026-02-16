@@ -596,11 +596,9 @@
                 
                 let statusBadge = '';
                 if (batch.pendingUsers > 0) {
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><span class="w-1.5 h-1.5 mr-1.5 bg-yellow-400 rounded-full"></span>รออนุมัติ (${batch.pendingUsers})</span>`;
-                } else if (batch.rejectedUsers > 0 && batch.approvedUsers === 0) {
-                     statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">ปฏิเสธทั้งหมด</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><span class="w-1.5 h-1.5 mr-1.5 bg-yellow-400 rounded-full"></span>รอดำเนินการ (${batch.pendingUsers})</span>`;
                 } else {
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">อนุมัติครบถ้วน</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">ดำเนินการเรียบร้อยแล้ว</span>`;
                 }
 
                 tr.innerHTML = `
@@ -672,6 +670,7 @@
             document.getElementById('roleSettingsModal').classList.add('hidden');
         }
 
+        // --- MISSING MENU FUNCTIONS ADDED HERE ---
         window.openMenuSettingsModal = function() {
             document.getElementById('menuSettingsModal').classList.remove('hidden');
             window.updateParentOptions(); 
@@ -702,7 +701,18 @@
             const mandatoryCheck = document.getElementById('newMenuMandatory');
             const mandatoryContainer = document.getElementById('newMenuMandatoryContainer');
             if(!mandatoryCheck || !mandatoryContainer) return;
-            // Logic for mandatory check
+            
+            const parentSelect = document.getElementById('newMenuParent');
+            if(parentSelect && parentSelect.value) {
+                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
+                // Let's assume sub-menus can be mandatory too.
+                mandatoryContainer.classList.remove('opacity-50');
+                mandatoryCheck.disabled = false;
+            } else {
+                // If main menu
+                mandatoryContainer.classList.remove('opacity-50');
+                mandatoryCheck.disabled = false;
+            }
         }
 
         window.renderMenuManagerTable = function() {
@@ -1420,14 +1430,14 @@
                 let statusBadge = '';
                 let actions = '';
                 if (currentUserRole === 'sale') {
-                     if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`; actions = `<span class="text-xs text-slate-400 italic">View Only</span>`; } else if (u.status === 'approved') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`; actions = `<span class="text-xs text-green-600">Approved</span>`; } else { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`; actions = `<span class="text-xs text-red-600">Rejected</span>`; }
+                     if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รอดำเนินการ</span>`; actions = `<span class="text-xs text-slate-400 italic">View Only</span>`; } else if (u.status === 'completed') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">ดำเนินการเรียบร้อยแล้ว</span>`; actions = `<span class="text-xs text-green-600">Completed</span>`; }
                 } else {
-                    if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รออนุมัติ</span>`; actions = ` <button onclick="window.editUser('${u.id}')" class="p-2 text-brand-600 hover:bg-brand-50 rounded" title="แก้ไข"><i class="fa-solid fa-pen"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'approved', '${batchId}')" class="p-2 text-green-600 hover:bg-green-50 rounded" title="อนุมัติ"><i class="fa-solid fa-check"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'rejected', '${batchId}')" class="p-2 text-red-600 hover:bg-red-50 rounded" title="ปฏิเสธ"><i class="fa-solid fa-xmark"></i></button> `; } else if (u.status === 'approved') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">อนุมัติแล้ว</span>`; actions = `<span class="text-xs text-slate-300">Success</span>`; } else { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">ปฏิเสธ</span>`; actions = `<span class="text-xs text-slate-300">Rejected</span>`; }
+                    if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รอดำเนินการ</span>`; actions = ` <button onclick="window.editUser('${u.id}')" class="p-2 text-brand-600 hover:bg-brand-50 rounded" title="แก้ไข"><i class="fa-solid fa-pen"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'completed', '${batchId}')" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs ml-1 shadow-sm">ยืนยันดำเนินการ</button>`; } else if (u.status === 'completed') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">ดำเนินการเรียบร้อยแล้ว</span>`; actions = `<button onclick="window.updateUserStatus('${u.id}', 'pending', '${batchId}')" class="text-xs text-slate-400 hover:text-red-500 underline ml-2">ยกเลิก</button>`; }
                 }
                 let roleColor = "bg-slate-100 text-slate-600";
                 if(u.role === 'Manager') roleColor = "bg-brand-50 text-brand-700 border border-brand-100";
                 const permListHTML = window.getPermissionNamesHTML(u.permissions);
-                tr.innerHTML = ` <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end gap-1">${actions}</div> </td> `; modalTableBody.appendChild(tr);
+                tr.innerHTML = ` <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end items-center gap-1 h-full">${actions}</div> </td> `; modalTableBody.appendChild(tr);
             });
             document.getElementById('detailModal').classList.remove('hidden');
         }
