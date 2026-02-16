@@ -322,7 +322,7 @@
         <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
             <!-- Sidebar -->
             <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">คน</span></div></div></div>
+                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
             </div>
             <!-- Form -->
             <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
@@ -1370,8 +1370,8 @@
              });
 
              Promise.all(promises).then(() => {
-                 const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=dHj9gDo1s98VBrlE_3yDJWzAlO9j2-lP51XEfr27OMw";
-                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} คน\n🆔 *Batch ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}`;
+                 const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
+                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}`;
                  fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8' }, body: JSON.stringify({ text: messageText }) }).catch(err => console.error("Error sending notification:", err));
 
                  window.closePreviewModal();
