@@ -225,7 +225,7 @@
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
             <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-xmark text-red-500 text-4xl"></i></div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลซ้ำ</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
             <button onclick="window.closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ปิดหน้าจอ</button>
         </div>
     </div>
@@ -234,7 +234,7 @@
     <div id="validationModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
             <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-circle-exclamation text-orange-500 text-4xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อมูลไม่ถูกต้อง</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อมูลไม่ครบถ้วน</h3>
             <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="validationMessage">กรุณากรอกข้อมูลให้ครบถ้วน</p>
             <button onclick="window.closeValidationModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ตกลง</button>
         </div>
@@ -569,9 +569,18 @@
             const batches = {};
             filteredRequests.forEach(req => {
                 if (!batches[req.batchId]) {
+                    // Convert createdAt to date string
+                    let displayDate = '-';
+                    if(req.createdAt) {
+                        const dateObj = req.createdAt.toDate ? req.createdAt.toDate() : new Date(req.createdAt.seconds * 1000);
+                        displayDate = dateObj.toLocaleDateString('th-TH', {
+                            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+                    }
+
                     batches[req.batchId] = {
                         batchId: req.batchId,
-                        date: req.date,
+                        date: displayDate,
                         merchantId: req.merchantId,
                         merchantName: req.merchantName,
                         totalUsers: 0,
@@ -1437,8 +1446,18 @@
             const batchUsers = requests.filter(r => r.batchId === batchId);
             if(batchUsers.length === 0) return;
             const first = batchUsers[0];
+            
+            // Fix Date display
+            let displayDate = '-';
+            if(first.createdAt) {
+                 const dateObj = first.createdAt.toDate ? first.createdAt.toDate() : new Date(first.createdAt.seconds * 1000);
+                 displayDate = dateObj.toLocaleDateString('th-TH', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+            }
+            
             document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${first.date}`;
+            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
