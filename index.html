@@ -322,7 +322,7 @@
         <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
             <!-- Sidebar -->
             <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
+                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลาย User ในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
             </div>
             <!-- Form -->
             <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
@@ -341,7 +341,7 @@
                     </div>
 
                     <div class="border-2 border-dashed border-brand-200 bg-brand-50/30 p-5 rounded-xl mb-4 relative transition-all" id="userInputSection">
-                        <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
+                        <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานUserที่ <span id="nextUserIndex">1</span></div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-2">
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">Username</label><input type="text" id="inputName" placeholder="ระบุ Username" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="inputEmail" placeholder="email@ex.com" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
@@ -618,7 +618,7 @@
                         <div class="text-[10px] text-slate-400 mt-1">Ref: ${batch.batchId}</div>
                     </td>
                     <td class="p-4 text-center">
-                        <span class="font-bold text-slate-700">${batch.totalUsers}</span> <span class="text-xs text-slate-400">คน</span>
+                        <span class="font-bold text-slate-700">${batch.totalUsers}</span> <span class="text-xs text-slate-400">User</span>
                     </td>
                     <td class="p-4 text-center">${statusBadge}</td>
                     <td class="p-4 text-right">
@@ -1588,6 +1588,7 @@
     </script>
 </body>
 </html>
+
 
 
 
