@@ -120,7 +120,7 @@
                 </div>
                 <div id="loginError" class="text-red-500 text-xs text-center hidden bg-red-50 py-2 rounded border border-red-100"><i class="fa-solid fa-circle-exclamation mr-1"></i> ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg shadow-lg shadow-slate-200 transition-all active:scale-[0.98] mt-2">เข้าสู่ระบบ</button>
-                <div class="text-center mt-4 text-[10px] text-slate-400">หากยังไม่มี User รบกวนติดต่อนัท</div>
+                <div class="text-center mt-4 text-[10px] text-slate-400">Default: admin / 1234</div>
             </form>
         </div>
     </div>
@@ -322,7 +322,7 @@
         <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
             <!-- Sidebar -->
             <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลาย User ในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
+                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
             </div>
             <!-- Form -->
             <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
@@ -341,7 +341,16 @@
                     </div>
 
                     <div class="border-2 border-dashed border-brand-200 bg-brand-50/30 p-5 rounded-xl mb-4 relative transition-all" id="userInputSection">
-                        <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานUserที่ <span id="nextUserIndex">1</span></div>
+                        <div class="flex justify-between items-center mb-4">
+                             <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
+                             <div class="ml-auto">
+                                 <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleImport(this)">
+                                 <button type="button" onclick="window.triggerImport()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                                     <i class="fa-solid fa-file-import"></i> Import CSV
+                                 </button>
+                             </div>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-2">
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">Username</label><input type="text" id="inputName" placeholder="ระบุ Username" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="inputEmail" placeholder="email@ex.com" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
@@ -351,7 +360,7 @@
                             <div id="mainRoleGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
                             <div id="roleDescription" class="mt-3 p-3 bg-white border border-brand-200 rounded-lg text-xs text-slate-600 shadow-sm hidden"></div>
                         </div>
-                        <details class="group bg-white rounded-lg border border-slate-200" open>
+                        <details class="group bg-white rounded-lg border border-slate-200">
                             <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-xs text-slate-600 bg-slate-50 rounded-t-lg group-open:border-b"><span><i class="fa-solid fa-list-check mr-2 text-brand-500"></i> กำหนดสิทธิ์รายเมนู (Advanced)</span><span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span></summary>
                             <div class="text-neutral-600 p-3 group-open:animate-fadeIn">
                                 <div class="flex justify-end gap-2 mb-2"><button type="button" onclick="window.toggleAll(true)" class="text-[10px] text-brand-600 bg-brand-50 px-2 py-1 rounded">เลือกทั้งหมด</button><button type="button" onclick="window.toggleAll(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded">ล้าง</button></div>
@@ -577,7 +586,7 @@
                             year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                         });
                     }
-
+                    
                     batches[req.batchId] = {
                         batchId: req.batchId,
                         date: displayDate,
@@ -592,7 +601,7 @@
                 }
                 batches[req.batchId].totalUsers++;
                 if(req.status === 'pending') batches[req.batchId].pendingUsers++;
-                if(req.status === 'approved') batches[req.batchId].approvedUsers++;
+                if(req.status === 'completed') batches[req.batchId].approvedUsers++; 
                 if(req.status === 'rejected') batches[req.batchId].rejectedUsers++;
                 batches[req.batchId].users.push(req);
             });
@@ -613,12 +622,12 @@
                 tr.innerHTML = `
                     <td class="p-4 text-slate-500">${batch.date}</td>
                     <td class="p-4">
-                        <div class="font-medium text-slate-800">${batch.merchantId}</div>
-                        <div class="text-xs text-slate-500">${batch.merchantName}</div>
+                        <div class="font-medium text-slate-800 max-w-[200px] truncate" title="${batch.merchantId}">${batch.merchantId}</div>
+                        <div class="text-xs text-slate-500 max-w-[200px] truncate" title="${batch.merchantName}">${batch.merchantName}</div>
                         <div class="text-[10px] text-slate-400 mt-1">Ref: ${batch.batchId}</div>
                     </td>
                     <td class="p-4 text-center">
-                        <span class="font-bold text-slate-700">${batch.totalUsers}</span> <span class="text-xs text-slate-400">User</span>
+                        <span class="font-bold text-slate-700">${batch.totalUsers}</span> <span class="text-xs text-slate-400">คน</span>
                     </td>
                     <td class="p-4 text-center">${statusBadge}</td>
                     <td class="p-4 text-right">
@@ -818,6 +827,216 @@
             }
         }
         // ------------------------------------
+
+        // --- IMPORT CSV FUNCTIONALITY ---
+        window.triggerImport = function() {
+            document.getElementById('importFile').click();
+        }
+
+        window.handleImport = function(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                if (text.includes("--- Merchant Information ---")) {
+                    window.processMatrixCSV(text);
+                } else {
+                    window.processSimpleCSV(text);
+                }
+                input.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        }
+
+        window.processSimpleCSV = function(text) {
+            const lines = text.split('\n');
+            let successCount = 0;
+            let failCount = 0;
+            
+            let startIndex = 0;
+            if (lines[0].toLowerCase().includes('username') && lines[0].toLowerCase().includes('email')) {
+                startIndex = 1;
+            }
+            
+            // Get Shared Merchant Info
+            const merchantId = document.querySelector('input[name="merchantId"]').value;
+            const merchantName = document.querySelector('input[name="merchantName"]').value;
+
+            if (!merchantId) {
+                 alert("กรุณาระบุรหัสร้านค้าก่อนนำเข้าข้อมูล");
+                 return;
+            }
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+                
+                if (parts.length >= 2) {
+                    const username = parts[0];
+                    const email = parts[1];
+                    const roleName = parts[2] || 'Custom';
+                    
+                    // Validation
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const thaiPattern = /[ก-๙]/;
+                    
+                    if (!emailPattern.test(email) || thaiPattern.test(username)) {
+                        failCount++;
+                        continue;
+                    }
+                    
+                    if (userQueue.some(u => u.fullName.toLowerCase() === username.toLowerCase())) {
+                         failCount++;
+                         continue;
+                    }
+
+                    let role = 'Custom';
+                    let perms = [];
+                    const matchedRole = Object.keys(rolePermissions).find(k => k.toLowerCase() === roleName.toLowerCase());
+                    
+                    if (matchedRole) {
+                        role = matchedRole;
+                        const rolePerms = rolePermissions[matchedRole];
+                        perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
+                    } else {
+                         perms = menuItems.filter(m => m.mandatory).map(m => m.id);
+                    }
+
+                    userQueue.push({
+                        tempId: Date.now() + i,
+                        fullName: username,
+                        email: email,
+                        role: role,
+                        permissionCount: perms.length,
+                        permissions: perms,
+                        merchantId: merchantId,
+                        merchantName: merchantName || '-'
+                    });
+                    successCount++;
+                }
+            }
+            
+            window.renderQueue();
+            if (successCount > 0 || failCount > 0) {
+                alert(`นำเข้าเรียบร้อย: ${successCount} รายการ\nไม่ผ่านเงื่อนไข/ซ้ำ: ${failCount} รายการ`);
+            }
+            
+            if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
+        }
+
+        window.processMatrixCSV = function(text) {
+             const lines = text.split('\n').map(l => l.trim());
+
+             // Helper to parse CSV line
+             const parseCSVValue = (str) => {
+                 if (!str) return '';
+                 str = str.trim();
+                 if (str.startsWith('"')) {
+                     const closeQuoteIndex = str.indexOf('"', 1);
+                     if (closeQuoteIndex !== -1) {
+                         return str.substring(1, closeQuoteIndex);
+                     }
+                 }
+                 const commaIndex = str.indexOf(',');
+                 if (commaIndex !== -1) {
+                     return str.substring(0, commaIndex).trim();
+                 }
+                 return str.trim();
+             };
+
+             // EXTRACT MERCHANT INFO
+             for(const line of lines) {
+                 if (line.startsWith("Merchant ID,")) {
+                     let valuePart = line.substring("Merchant ID,".length);
+                     const val = parseCSVValue(valuePart);
+                     if(val && val !== '-') document.querySelector('input[name="merchantId"]').value = val;
+                 }
+                 if (line.startsWith("Merchant Name,")) {
+                     let valuePart = line.substring("Merchant Name,".length);
+                     const val = parseCSVValue(valuePart);
+                     if(val && val !== '-') document.querySelector('input[name="merchantName"]').value = val;
+                 }
+             }
+             
+             let userSectionIndex = -1;
+             for(let i=0; i<lines.length; i++) {
+                 if(lines[i].includes("--- User Details ---")) {
+                     userSectionIndex = i;
+                     break;
+                 }
+             }
+
+             if (userSectionIndex === -1) {
+                 alert("ไม่พบข้อมูลผู้ใช้งานในไฟล์ (User Details Section not found)");
+                 return;
+             }
+             
+             const parseLine = (line) => {
+                 const firstComma = line.indexOf(',');
+                 if (firstComma === -1) return [];
+                 return line.substring(firstComma + 1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+             };
+             
+             let usernames = [], roles = [], emails = [];
+             
+             for(let i=userSectionIndex; i<userSectionIndex+10 && i<lines.length; i++) {
+                 if(lines[i].startsWith("User Name,")) usernames = parseLine(lines[i]);
+                 if(lines[i].startsWith("Role,")) roles = parseLine(lines[i]);
+                 if(lines[i].startsWith("Email,")) emails = parseLine(lines[i]);
+             }
+             
+             if(usernames.length === 0) {
+                  alert("ไม่พบรายชื่อผู้ใช้งาน");
+                  return;
+             }
+             
+             let successCount = 0;
+             const merchantId = document.querySelector('input[name="merchantId"]').value;
+             const merchantName = document.querySelector('input[name="merchantName"]').value;
+             
+             for(let i=0; i<usernames.length; i++) {
+                 const u = usernames[i];
+                 const e = emails[i] || '';
+                 const r = roles[i] || 'Custom';
+                 
+                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                 const thaiPattern = /[ก-๙]/;
+                 
+                 if (!emailPattern.test(e) || thaiPattern.test(u)) continue;
+                 if (userQueue.some(existing => existing.fullName.toLowerCase() === u.toLowerCase())) continue;
+
+                 let finalRole = 'Custom';
+                 let perms = [];
+                 const matchedRole = Object.keys(rolePermissions).find(k => k.toLowerCase() === r.toLowerCase());
+                 if (matchedRole) {
+                     finalRole = matchedRole;
+                     const rolePerms = rolePermissions[matchedRole];
+                     perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
+                 } else {
+                      perms = menuItems.filter(m => m.mandatory).map(m => m.id);
+                 }
+
+                 userQueue.push({
+                     tempId: Date.now() + i,
+                     fullName: u,
+                     email: e,
+                     role: finalRole,
+                     permissionCount: perms.length,
+                     permissions: perms,
+                     merchantId: merchantId,
+                     merchantName: merchantName || '-'
+                 });
+                 successCount++;
+             }
+
+             window.renderQueue();
+             if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
+             alert(`นำเข้าเรียบร้อย: ${successCount} รายการ (จากไฟล์ Matrix)`);
+        }
 
         window.saveAdminUser = async function(e) {
             e.preventDefault();
@@ -1162,16 +1381,25 @@
         window.addToQueue = function() {
              const nameInput = document.getElementById('inputName');
              const emailInput = document.getElementById('inputEmail');
+             const merchantIdInput = document.querySelector('input[name="merchantId"]');
+             const merchantNameInput = document.querySelector('input[name="merchantName"]');
              
              // Reset styles first
              nameInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
              emailInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+             merchantIdInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
 
              const name = nameInput.value.trim();
              const email = emailInput.value.trim();
-             const merchantId = document.querySelector('input[name="merchantId"]').value.trim();
+             const merchantId = merchantIdInput.value.trim();
+             const merchantName = merchantNameInput.value.trim();
              
-             if(!merchantId) { window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)'); return; }
+             if(!merchantId) { 
+                 window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
+                 merchantIdInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                 merchantIdInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
+                 return; 
+             }
              if(!name || !email) { window.showValidationModal('กรุณากรอกข้อมูลผู้ใช้งานให้ครบถ้วน<br>(Username และ อีเมล)'); return; }
              
              // 1. Email Format Check
@@ -1220,13 +1448,22 @@
              });
              menuItems.forEach(m => { if(m.mandatory) permSet.add(m.id); });
              
-             userQueue.push({ tempId: Date.now(), fullName: name, email: email, role: role, permissionCount: permSet.size, permissions: Array.from(permSet) });
+             userQueue.push({
+                 tempId: Date.now(), 
+                 merchantId: merchantId,
+                 merchantName: merchantName || '-',
+                 fullName: name, 
+                 email: email, 
+                 role: role, 
+                 permissionCount: permSet.size, 
+                 permissions: Array.from(permSet) 
+             });
+             
              window.renderQueue();
              document.getElementById('inputName').value = '';
              document.getElementById('inputEmail').value = '';
+             // Keep merchant ID for convenience or clear it? Better keep it for batch entry of same merchant.
              
-             // Keep merchant ID, but reset user inputs
-             // Refresh queue display
              document.getElementById('queueSection').classList.remove('hidden');
              
              // Reset Roles & Permissions (Keep mandatory)
@@ -1245,8 +1482,10 @@
             const merchantNameInput = document.querySelector('input[name="merchantName"]');
             if (merchantIdInput) merchantIdInput.value = '';
             if (merchantNameInput) merchantNameInput.value = '';
+            
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputEmail').value = '';
 
-            // Explicitly hide success modal
             const successMessageEl = document.getElementById('successMessage');
             if(successMessageEl) {
                 successMessageEl.classList.add('hidden');
@@ -1258,13 +1497,11 @@
             const item = userQueue.find(u => u.tempId === tempId);
             if (!item) return;
 
-            // Restore basic inputs
-            const nameInput = document.getElementById('inputName');
-            const emailInput = document.getElementById('inputEmail');
-            if(nameInput) nameInput.value = item.fullName;
-            if(emailInput) emailInput.value = item.email;
+            document.querySelector('input[name="merchantId"]').value = item.merchantId;
+            document.querySelector('input[name="merchantName"]').value = item.merchantName;
+            document.getElementById('inputName').value = item.fullName;
+            document.getElementById('inputEmail').value = item.email;
 
-            // Restore Role
             const roleRadios = document.querySelectorAll('input[name="role"]');
             let roleMatched = false;
             roleRadios.forEach(r => {
@@ -1276,12 +1513,10 @@
                 }
             });
             
-            // If custom role or not found in presets
             if (!roleMatched) {
                 roleRadios.forEach(r => r.checked = false);
             }
             
-            // Update Description box based on role
             const descBox = document.getElementById('roleDescription');
             if (roleMatched && roleDescriptions[item.role]) {
                 const displayDesc = roleDescriptions[item.role].replace(/\n/g, '<br>');
@@ -1291,7 +1526,6 @@
                 descBox.classList.add('hidden');
             }
 
-            // Restore Permissions
             window.toggleAll(false, false); 
             
             const checkboxes = document.querySelectorAll('input[name="permissions"]');
@@ -1307,11 +1541,9 @@
                 }
             });
 
-            // Remove from queue so it can be re-added
             window.removeFromQueue(tempId);
 
-            // UI Feedback
-            if(nameInput) nameInput.focus();
+            document.getElementById('inputName').focus();
             const section = document.getElementById('userInputSection');
             if(section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1378,8 +1610,7 @@
              const promises = userQueue.map(u => {
                  return addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), {
                      ...u, 
-                     merchantId, 
-                     merchantName, // Add merchantName to DB
+                     // Each request has its own merchant info now
                      batchId, 
                      status: 'pending', 
                      createdAt: serverTimestamp()
@@ -1447,17 +1678,15 @@
             if(batchUsers.length === 0) return;
             const first = batchUsers[0];
             
-            // Fix Date display
-            let displayDate = '-';
-            if(first.createdAt) {
-                 const dateObj = first.createdAt.toDate ? first.createdAt.toDate() : new Date(first.createdAt.seconds * 1000);
-                 displayDate = dateObj.toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
+            // Check for mixed merchants
+            const uniqueMerchants = [...new Set(batchUsers.map(u => u.merchantId))];
+            let displayMerchant = `${first.merchantId} - ${first.merchantName}`;
+            if (uniqueMerchants.length > 1) {
+                displayMerchant = "Multiple Merchants (คละร้านค้า)";
             }
-            
-            document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
+
+            document.getElementById('modalMerchantName').textContent = displayMerchant;
+            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${first.date}`;
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
@@ -1473,7 +1702,8 @@
                 let roleColor = "bg-slate-100 text-slate-600";
                 if(u.role === 'Manager') roleColor = "bg-brand-50 text-brand-700 border border-brand-100";
                 const permListHTML = window.getPermissionNamesHTML(u.permissions);
-                tr.innerHTML = ` <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end items-center gap-1 h-full">${actions}</div> </td> `; modalTableBody.appendChild(tr);
+                tr.innerHTML = ` 
+                    <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end items-center gap-1 h-full">${actions}</div> </td> `; modalTableBody.appendChild(tr);
             });
             document.getElementById('detailModal').classList.remove('hidden');
         }
@@ -1546,7 +1776,20 @@
         window.editUser = function(id) { const user = requests.find(r => r.id === id); if (!user) return; document.getElementById('editUserId').value = user.id; document.getElementById('editName').value = user.fullName; document.getElementById('editEmail').value = user.email; const roleRadios = document.querySelectorAll('input[name="editRole"]'); let roleFound = false; roleRadios.forEach(r => { if (r.value === user.role) { r.checked = true; roleFound = true; } }); if(!roleFound) { roleRadios.forEach(r => r.checked = false); } const editCheckboxes = document.querySelectorAll('input[name="editPermissions"]'); editCheckboxes.forEach(cb => { const pid = parseInt(cb.value); cb.checked = user.permissions.includes(pid); const item = menuItems.find(m => m.id === pid); if (item && item.mandatory) { cb.checked = true; } }); document.getElementById('editUserModal').classList.remove('hidden'); }
         window.closeEditModal = function() { document.getElementById('editUserModal').classList.add('hidden'); }
         window.saveUserChanges = function() { const id = document.getElementById('editUserId').value; const originalUser = requests.find(r => r.id === id); if (originalUser) { let role = 'Custom'; const roleRadio = document.querySelector('input[name="editRole"]:checked'); if (roleRadio) role = roleRadio.value; let permissions = []; document.querySelectorAll('input[name="editPermissions"]:checked').forEach(cb => { permissions.push(parseInt(cb.value)); }); permissions = cleanPermissions(permissions); const updates = { fullName: document.getElementById('editName').value, email: document.getElementById('editEmail').value, role: role, permissions: permissions, permissionCount: permissions.length }; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), updates).then(() => { window.closeEditModal(); window.openDetailModal(originalUser.batchId); }); } }
-        window.openPreviewModal = function() { const merchantId = document.querySelector('input[name="merchantId"]').value; const merchantName = document.querySelector('input[name="merchantName"]').value || '-'; document.getElementById('previewMerchantId').textContent = merchantId; document.getElementById('previewMerchantName').textContent = merchantName; document.getElementById('previewUserCount').textContent = userQueue.length; const previewUserList = document.getElementById('previewUserList'); previewUserList.innerHTML = ''; const displayItems = getSortedMenuItems(); userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
+        window.openPreviewModal = function() { 
+            // Update Preview Modal Logic for Single Merchant
+            const merchantId = document.querySelector('input[name="merchantId"]').value;
+            const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
+            
+            document.getElementById('previewMerchantId').textContent = merchantId;
+            document.getElementById('previewMerchantName').textContent = merchantName;
+            document.getElementById('previewUserCount').textContent = userQueue.length;
+
+            const previewUserList = document.getElementById('previewUserList');
+            previewUserList.innerHTML = '';
+            
+            const displayItems = getSortedMenuItems();
+            userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
         window.closePreviewModal = function() { document.getElementById('previewModal').classList.add('hidden'); }
 
         // Initial Renders (FORCE RENDER TO SHOW DEFAULT DATA IMMEDIATELY)
@@ -1588,7 +1831,3 @@
     </script>
 </body>
 </html>
-
-
-
-
