@@ -344,8 +344,7 @@
                         <div class="flex justify-between items-center mb-4">
                              <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
                              <div class="ml-auto">
-                                 <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleImport(this)">
-                                 <button type="button" onclick="window.triggerImport()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                                 <button type="button" onclick="window.openImportModal()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
                                      <i class="fa-solid fa-file-import"></i> Import CSV
                                  </button>
                              </div>
@@ -938,9 +937,7 @@
             // Note for Simple CSV
             const note = document.getElementById('importNote');
             if(success > 0 && !document.querySelector('input[name="merchantId"]').value) {
-               // Logic to detect if simple csv was used
-               // For now just hide
-               note.classList.add('hidden');
+               note.classList.remove('hidden');
             } else {
                note.classList.add('hidden');
             }
@@ -953,18 +950,6 @@
         }
 
         // --- IMPORT CSV FUNCTIONALITY ---
-        // (Deprecated direct click trigger, kept for backup)
-        window.triggerImport = function() {
-            document.getElementById('importFile').click();
-        }
-
-        // (Deprecated direct handle, kept for backup)
-        window.handleImport = function(input) {
-            const file = input.files[0];
-            if (!file) return;
-             // ... logic moved to handleFileSelect and processImportFile
-        }
-
         window.processSimpleCSV = function(text) {
             const lines = text.split('\n');
             let successCount = 0;
@@ -978,12 +963,6 @@
             // Get Shared Merchant Info
             const merchantId = document.querySelector('input[name="merchantId"]').value;
             const merchantName = document.querySelector('input[name="merchantName"]').value;
-
-            // Simple CSV needs manual merchant input first
-            if (!merchantId) {
-                 document.getElementById('importNote').classList.remove('hidden');
-                 document.getElementById('importNote').textContent = "* ไม่ได้ระบุร้านค้า (กรุณาระบุที่หน้าฟอร์มก่อนนำเข้า)";
-            }
 
             for (let i = startIndex; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -1029,7 +1008,6 @@
                         role: role,
                         permissionCount: perms.length,
                         permissions: perms,
-                        // Use global inputs for simple CSV
                         merchantId: merchantId,
                         merchantName: merchantName || '-'
                     });
@@ -1720,6 +1698,11 @@
              const merchantId = document.querySelector('input[name="merchantId"]').value;
              const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
              const batchId = 'B-' + Date.now();
+
+             if(!merchantId) { 
+                 window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
+                 return; 
+             }
              
              // --- FIX: Add Loading State to btnRealSubmit ---
              const btn = document.getElementById('btnRealSubmit');
@@ -1732,7 +1715,8 @@
              const promises = userQueue.map(u => {
                  return addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), {
                      ...u, 
-                     // Each request has its own merchant info now
+                     merchantId: merchantId,
+                     merchantName: merchantName,
                      batchId, 
                      status: 'pending', 
                      createdAt: serverTimestamp()
