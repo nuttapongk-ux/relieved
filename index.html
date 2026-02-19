@@ -240,48 +240,6 @@
         </div>
     </div>
 
-    <!-- Import File Modal -->
-    <div id="importModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-file-import mr-2"></i>นำเข้าข้อมูล (Import CSV)</h3>
-                <button onclick="window.closeImportModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            </div>
-            <div class="p-6">
-                <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer" onclick="document.getElementById('importFile').click()" ondragover="event.preventDefault()" ondrop="window.handleDrop(event)">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
-                    </div>
-                    <h4 class="text-slate-700 font-medium mb-1">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</h4>
-                    <p class="text-slate-400 text-xs">รองรับไฟล์ .csv เท่านั้น</p>
-                    <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleFileSelect(this)">
-                </div>
-                <div id="importFileName" class="mt-4 text-center text-sm text-slate-600 hidden">
-                    <span class="font-bold text-brand-600">ไฟล์ที่เลือก:</span> <span id="selectedFileName"></span>
-                </div>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
-                 <button onclick="window.closeImportModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white text-sm font-medium">ยกเลิก</button>
-                 <button id="btnProcessImport" onclick="window.processImportFile()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>นำเข้าข้อมูล</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Import Result Modal -->
-    <div id="importResultModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
-            <div id="importResultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm bg-blue-50 text-blue-500"><i class="fa-solid fa-file-import text-3xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ผลการนำเข้า</h3>
-            <div class="text-sm text-slate-600 mb-6 space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                <div class="flex justify-between"><span>รายการทั้งหมด:</span> <span id="resultTotal" class="font-bold">0</span></div>
-                <div class="flex justify-between text-green-600"><span>นำเข้าสำเร็จ:</span> <span id="resultSuccess" class="font-bold">0</span></div>
-                <div class="flex justify-between text-red-500"><span>ไม่ผ่าน/ซ้ำ:</span> <span id="resultFail" class="font-bold">0</span></div>
-            </div>
-            <p id="importNote" class="text-xs text-orange-500 mb-4 hidden">* โปรดระบุรหัสร้านค้าสำหรับรายการที่นำเข้า</p>
-            <button onclick="window.closeImportResultModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow-md transition-all">ตกลง</button>
-        </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
     <div id="deleteConfirmModal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform transition-all scale-100">
@@ -387,7 +345,7 @@
                              <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
                              <div class="ml-auto">
                                  <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleImport(this)">
-                                 <button type="button" onclick="window.openImportModal()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                                 <button type="button" onclick="window.triggerImport()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
                                      <i class="fa-solid fa-file-import"></i> Import CSV
                                  </button>
                              </div>
@@ -808,12 +766,9 @@
             
             const parentSelect = document.getElementById('newMenuParent');
             if(parentSelect && parentSelect.value) {
-                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
-                // Let's assume sub-menus can be mandatory too.
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             } else {
-                // If main menu
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             }
@@ -1074,6 +1029,7 @@
                         role: role,
                         permissionCount: perms.length,
                         permissions: perms,
+                        // Use global inputs for simple CSV
                         merchantId: merchantId,
                         merchantName: merchantName || '-'
                     });
@@ -1785,7 +1741,7 @@
 
              Promise.all(promises).then(() => {
                  const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
-                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}`;
+                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
                  fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8' }, body: JSON.stringify({ text: messageText }) }).catch(err => console.error("Error sending notification:", err));
 
                  window.closePreviewModal();
@@ -1813,9 +1769,29 @@
         
         // --- ADDED MISSING FUNCTIONS FOR DETAIL MODAL ---
         window.updateUserStatus = function(id, newStatus, currentBatchId) {
+            // Find user info for notification
+            const userRequest = requests.find(r => r.id === id);
+
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), {
                 status: newStatus
             }).then(() => {
+                if (newStatus === 'completed' && userRequest) {
+                     const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
+                     // Format date safely
+                     let requestDate = '-';
+                     if(userRequest.createdAt) {
+                        const dateObj = userRequest.createdAt.toDate ? userRequest.createdAt.toDate() : new Date(userRequest.createdAt.seconds * 1000);
+                        requestDate = dateObj.toLocaleDateString('th-TH');
+                     }
+
+                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n👤 *User:* ${userRequest.fullName}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
+                     
+                     fetch(webhookUrl, { 
+                         method: 'POST', 
+                         headers: { 'Content-Type': 'application/json; charset=UTF-8' }, 
+                         body: JSON.stringify({ text: messageText }) 
+                     }).catch(err => console.error("Error sending notification:", err));
+                }
                 window.openDetailModal(currentBatchId);
             });
         };
@@ -1851,8 +1827,17 @@
                 displayMerchant = "Multiple Merchants (คละร้านค้า)";
             }
 
+            // Fix Date display
+            let displayDate = '-';
+            if(first.createdAt) {
+                 const dateObj = first.createdAt.toDate ? first.createdAt.toDate() : new Date(first.createdAt.seconds * 1000);
+                 displayDate = dateObj.toLocaleDateString('th-TH', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+            }
+
             document.getElementById('modalMerchantName').textContent = displayMerchant;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${first.date}`;
+            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
@@ -1942,20 +1927,7 @@
         window.editUser = function(id) { const user = requests.find(r => r.id === id); if (!user) return; document.getElementById('editUserId').value = user.id; document.getElementById('editName').value = user.fullName; document.getElementById('editEmail').value = user.email; const roleRadios = document.querySelectorAll('input[name="editRole"]'); let roleFound = false; roleRadios.forEach(r => { if (r.value === user.role) { r.checked = true; roleFound = true; } }); if(!roleFound) { roleRadios.forEach(r => r.checked = false); } const editCheckboxes = document.querySelectorAll('input[name="editPermissions"]'); editCheckboxes.forEach(cb => { const pid = parseInt(cb.value); cb.checked = user.permissions.includes(pid); const item = menuItems.find(m => m.id === pid); if (item && item.mandatory) { cb.checked = true; } }); document.getElementById('editUserModal').classList.remove('hidden'); }
         window.closeEditModal = function() { document.getElementById('editUserModal').classList.add('hidden'); }
         window.saveUserChanges = function() { const id = document.getElementById('editUserId').value; const originalUser = requests.find(r => r.id === id); if (originalUser) { let role = 'Custom'; const roleRadio = document.querySelector('input[name="editRole"]:checked'); if (roleRadio) role = roleRadio.value; let permissions = []; document.querySelectorAll('input[name="editPermissions"]:checked').forEach(cb => { permissions.push(parseInt(cb.value)); }); permissions = cleanPermissions(permissions); const updates = { fullName: document.getElementById('editName').value, email: document.getElementById('editEmail').value, role: role, permissions: permissions, permissionCount: permissions.length }; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), updates).then(() => { window.closeEditModal(); window.openDetailModal(originalUser.batchId); }); } }
-        window.openPreviewModal = function() { 
-            // Update Preview Modal Logic for Single Merchant
-            const merchantId = document.querySelector('input[name="merchantId"]').value;
-            const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
-            
-            document.getElementById('previewMerchantId').textContent = merchantId;
-            document.getElementById('previewMerchantName').textContent = merchantName;
-            document.getElementById('previewUserCount').textContent = userQueue.length;
-
-            const previewUserList = document.getElementById('previewUserList');
-            previewUserList.innerHTML = '';
-            
-            const displayItems = getSortedMenuItems();
-            userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
+        window.openPreviewModal = function() { const merchantId = document.querySelector('input[name="merchantId"]').value; const merchantName = document.querySelector('input[name="merchantName"]').value || '-'; document.getElementById('previewMerchantId').textContent = merchantId; document.getElementById('previewMerchantName').textContent = merchantName; document.getElementById('previewUserCount').textContent = userQueue.length; const previewUserList = document.getElementById('previewUserList'); previewUserList.innerHTML = ''; const displayItems = getSortedMenuItems(); userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
         window.closePreviewModal = function() { document.getElementById('previewModal').classList.add('hidden'); }
 
         // Initial Renders (FORCE RENDER TO SHOW DEFAULT DATA IMMEDIATELY)
