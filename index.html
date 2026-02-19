@@ -240,6 +240,48 @@
         </div>
     </div>
 
+    <!-- Import File Modal -->
+    <div id="importModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-file-import mr-2"></i>นำเข้าข้อมูล (Import CSV)</h3>
+                <button onclick="window.closeImportModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer" onclick="document.getElementById('importFile').click()" ondragover="event.preventDefault()" ondrop="window.handleDrop(event)">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                    </div>
+                    <h4 class="text-slate-700 font-medium mb-1">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</h4>
+                    <p class="text-slate-400 text-xs">รองรับไฟล์ .csv เท่านั้น</p>
+                    <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleFileSelect(this)">
+                </div>
+                <div id="importFileName" class="mt-4 text-center text-sm text-slate-600 hidden">
+                    <span class="font-bold text-brand-600">ไฟล์ที่เลือก:</span> <span id="selectedFileName"></span>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                 <button onclick="window.closeImportModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white text-sm font-medium">ยกเลิก</button>
+                 <button id="btnProcessImport" onclick="window.processImportFile()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>นำเข้าข้อมูล</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Result Modal -->
+    <div id="importResultModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div id="importResultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm bg-blue-50 text-blue-500"><i class="fa-solid fa-file-import text-3xl"></i></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ผลการนำเข้า</h3>
+            <div class="text-sm text-slate-600 mb-6 space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <div class="flex justify-between"><span>รายการทั้งหมด:</span> <span id="resultTotal" class="font-bold">0</span></div>
+                <div class="flex justify-between text-green-600"><span>นำเข้าสำเร็จ:</span> <span id="resultSuccess" class="font-bold">0</span></div>
+                <div class="flex justify-between text-red-500"><span>ไม่ผ่าน/ซ้ำ:</span> <span id="resultFail" class="font-bold">0</span></div>
+            </div>
+            <p id="importNote" class="text-xs text-orange-500 mb-4 hidden">* โปรดระบุรหัสร้านค้าสำหรับรายการที่นำเข้า</p>
+            <button onclick="window.closeImportResultModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow-md transition-all">ตกลง</button>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div id="deleteConfirmModal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform transition-all scale-100">
@@ -345,7 +387,7 @@
                              <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
                              <div class="ml-auto">
                                  <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleImport(this)">
-                                 <button type="button" onclick="window.triggerImport()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                                 <button type="button" onclick="window.openImportModal()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
                                      <i class="fa-solid fa-file-import"></i> Import CSV
                                  </button>
                              </div>
@@ -402,6 +444,48 @@
             </div>
         </div>
     </div>
+    
+    <!-- Import Modal (New) -->
+    <div id="importModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-file-import mr-2"></i>นำเข้าข้อมูล (Import CSV)</h3>
+                <button onclick="window.closeImportModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer" onclick="document.getElementById('importFile').click()" ondragover="event.preventDefault()" ondrop="window.handleDrop(event)">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                    </div>
+                    <h4 class="text-slate-700 font-medium mb-1">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</h4>
+                    <p class="text-slate-400 text-xs">รองรับไฟล์ .csv เท่านั้น</p>
+                    <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleFileSelect(this)">
+                </div>
+                <div id="importFileName" class="mt-4 text-center text-sm text-slate-600 hidden">
+                    <span class="font-bold text-brand-600">ไฟล์ที่เลือก:</span> <span id="selectedFileName"></span>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                 <button onclick="window.closeImportModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white text-sm font-medium">ยกเลิก</button>
+                 <button id="btnProcessImport" onclick="window.processImportFile()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>นำเข้าข้อมูล</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Result Modal (New) -->
+    <div id="importResultModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div id="importResultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm bg-blue-50 text-blue-500"><i class="fa-solid fa-file-import text-3xl"></i></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ผลการนำเข้า</h3>
+            <div class="text-sm text-slate-600 mb-6 space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <div class="flex justify-between"><span>รายการทั้งหมด:</span> <span id="resultTotal" class="font-bold">0</span></div>
+                <div class="flex justify-between text-green-600"><span>นำเข้าสำเร็จ:</span> <span id="resultSuccess" class="font-bold">0</span></div>
+                <div class="flex justify-between text-red-500"><span>ไม่ผ่าน/ซ้ำ:</span> <span id="resultFail" class="font-bold">0</span></div>
+            </div>
+            <p id="importNote" class="text-xs text-orange-500 mb-4 hidden">* โปรดระบุรหัสร้านค้าสำหรับรายการที่นำเข้า</p>
+            <button onclick="window.closeImportResultModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow-md transition-all">ตกลง</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -445,6 +529,8 @@
             { id: 15, name: "แดชบอร์ด", type: 'header', mandatory: true }, { id: 23, name: "ยอดรวมรายได้", type: 'header', mandatory: false }, { id: 41, name: "ประวัติการโอนเงินคืน", type: 'header', mandatory: false }, { id: 24, name: "รายการสั่งซื้อและผู้ซื้อ", type: 'header', mandatory: false }, { id: 25, name: "รายการสั่งซื้อทั้งหมด", type: 'item', parentId: 24 }, { id: 26, name: "คืนเงินหรือยกเลิกรายการ", type: 'item', parentId: 24 }, { id: 27, name: "อัตราแลกเปลี่ยน", type: 'item', parentId: 24 }, { id: 28, name: "จัดการข้อมูลร้านค้า", type: 'header', mandatory: false }, { id: 29, name: "ตั้งค่าเบื้องต้น", type: 'item', parentId: 28 }, { id: 30, name: "ข้อมูลส่วนตัว", type: 'item', parentId: 28 }, { id: 31, name: "แก้ไขข้อมูลส่วนตัว", type: 'item', parentId: 28 }, { id: 32, name: "แก้ไขข้อมูลบัญชีธนาคาร", type: 'item', parentId: 28 }, { id: 33, name: "เปลี่ยนรหัสผ่าน", type: 'item', parentId: 28 }, { id: 34, name: "ข้อมูลใบกำกับภาษี", type: 'item', parentId: 28 }, { id: 54, name: "ส่งค่ากลับเว็บไซต์หลัก", type: 'item', parentId: 28 }, { id: 10753, name: "จัดการเอกสาร", type: 'header', mandatory: false }, { id: 40, name: "ลิงก์ชำระเงิน (Pay.sn)", type: 'header', mandatory: false }, { id: 5278, name: "ลิงก์รับชำระเงินของร้านค้า", type: 'item', parentId: 40 }, { id: 5279, name: "ลิงก์รับชำระเงินแบบกำหนดเวลา", type: 'item', parentId: 40 }, { id: 46, name: "เทคนิคการใช้งาน", type: 'header', mandatory: false }, { id: 47, name: "บริการชำระเงินอัตโนมัติ", type: 'header', mandatory: false }, { id: 48, name: "สร้างรายการชำระเงินอัตโนมัติ", type: 'item', parentId: 47 }, { id: 49, name: "การชำระเงินอัตโนมัติ", type: 'item', parentId: 47 }, { id: 9531, name: "เพิ่มโลโก้ชำระเงินบนเว็บไซต์", type: 'header', mandatory: false }, { id: 10031, name: "ข่าวสารและกิจกรรมใหม่", type: 'header', mandatory: false }, { id: 10032, name: "ดาวน์โหลดใบเสร็จ / ใบกำกับภาษี อิเล็กทรอนิกส์", type: 'header', mandatory: false }, { id: 10752, name: "ตัวแทนจำหน่าย", type: 'header', mandatory: false }
         ];
         let userQueue = [], requests = [], adminUsersList = [], currentModalBatchId = null, editingMenuId = null, currentSettingsRole = 'Manager', editingRoleKey = null, itemToDelete = null, deleteType = null, isAdminLoggedIn = false, currentUserRole = null;
+        
+        let currentImportFile = null;
 
         // --- Functions ---
         function getSortedMenuItems() {
@@ -586,7 +672,7 @@
                             year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                         });
                     }
-                    
+
                     batches[req.batchId] = {
                         batchId: req.batchId,
                         date: displayDate,
@@ -722,9 +808,12 @@
             
             const parentSelect = document.getElementById('newMenuParent');
             if(parentSelect && parentSelect.value) {
+                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
+                // Let's assume sub-menus can be mandatory too.
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             } else {
+                // If main menu
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             }
@@ -827,27 +916,98 @@
             }
         }
         // ------------------------------------
-
-        // --- IMPORT CSV FUNCTIONALITY ---
-        window.triggerImport = function() {
-            document.getElementById('importFile').click();
+        
+        // --- NEW: Multiple Merchant Logic ---
+        window.openImportModal = function() {
+            document.getElementById('importModal').classList.remove('hidden');
+            // Reset
+            currentImportFile = null;
+            document.getElementById('importFile').value = '';
+            document.getElementById('importFileName').classList.add('hidden');
+            document.getElementById('btnProcessImport').disabled = true;
+            document.getElementById('btnProcessImport').classList.add('opacity-50', 'cursor-not-allowed');
         }
 
-        window.handleImport = function(input) {
+        window.closeImportModal = function() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
+
+        window.handleFileSelect = function(input) {
             const file = input.files[0];
-            if (!file) return;
+            if (file) {
+                currentImportFile = file;
+                document.getElementById('selectedFileName').textContent = file.name;
+                document.getElementById('importFileName').classList.remove('hidden');
+                
+                const btn = document.getElementById('btnProcessImport');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        window.handleDrop = function(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                 currentImportFile = file;
+                 document.getElementById('selectedFileName').textContent = file.name;
+                 document.getElementById('importFileName').classList.remove('hidden');
+                 
+                 const btn = document.getElementById('btnProcessImport');
+                 btn.disabled = false;
+                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        window.processImportFile = function() {
+            if (!currentImportFile) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const text = e.target.result;
+                window.closeImportModal();
                 if (text.includes("--- Merchant Information ---")) {
                     window.processMatrixCSV(text);
                 } else {
                     window.processSimpleCSV(text);
                 }
-                input.value = ''; // Reset input
             };
-            reader.readAsText(file);
+            reader.readAsText(currentImportFile);
+        }
+
+        window.showImportResult = function(success, fail) {
+            document.getElementById('resultTotal').textContent = success + fail;
+            document.getElementById('resultSuccess').textContent = success;
+            document.getElementById('resultFail').textContent = fail;
+            
+            // Note for Simple CSV
+            const note = document.getElementById('importNote');
+            if(success > 0 && !document.querySelector('input[name="merchantId"]').value) {
+               // Logic to detect if simple csv was used
+               // For now just hide
+               note.classList.add('hidden');
+            } else {
+               note.classList.add('hidden');
+            }
+
+            document.getElementById('importResultModal').classList.remove('hidden');
+        }
+
+        window.closeImportResultModal = function() {
+             document.getElementById('importResultModal').classList.add('hidden');
+        }
+
+        // --- IMPORT CSV FUNCTIONALITY ---
+        // (Deprecated direct click trigger, kept for backup)
+        window.triggerImport = function() {
+            document.getElementById('importFile').click();
+        }
+
+        // (Deprecated direct handle, kept for backup)
+        window.handleImport = function(input) {
+            const file = input.files[0];
+            if (!file) return;
+             // ... logic moved to handleFileSelect and processImportFile
         }
 
         window.processSimpleCSV = function(text) {
@@ -864,9 +1024,10 @@
             const merchantId = document.querySelector('input[name="merchantId"]').value;
             const merchantName = document.querySelector('input[name="merchantName"]').value;
 
+            // Simple CSV needs manual merchant input first
             if (!merchantId) {
-                 alert("กรุณาระบุรหัสร้านค้าก่อนนำเข้าข้อมูล");
-                 return;
+                 document.getElementById('importNote').classList.remove('hidden');
+                 document.getElementById('importNote').textContent = "* ไม่ได้ระบุร้านค้า (กรุณาระบุที่หน้าฟอร์มก่อนนำเข้า)";
             }
 
             for (let i = startIndex; i < lines.length; i++) {
@@ -921,9 +1082,7 @@
             }
             
             window.renderQueue();
-            if (successCount > 0 || failCount > 0) {
-                alert(`นำเข้าเรียบร้อย: ${successCount} รายการ\nไม่ผ่านเงื่อนไข/ซ้ำ: ${failCount} รายการ`);
-            }
+            window.showImportResult(successCount, failCount);
             
             if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
         }
@@ -995,6 +1154,7 @@
              }
              
              let successCount = 0;
+             let failCount = 0;
              const merchantId = document.querySelector('input[name="merchantId"]').value;
              const merchantName = document.querySelector('input[name="merchantName"]').value;
              
@@ -1006,8 +1166,14 @@
                  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                  const thaiPattern = /[ก-๙]/;
                  
-                 if (!emailPattern.test(e) || thaiPattern.test(u)) continue;
-                 if (userQueue.some(existing => existing.fullName.toLowerCase() === u.toLowerCase())) continue;
+                 if (!emailPattern.test(e) || thaiPattern.test(u)) {
+                     failCount++;
+                     continue;
+                 }
+                 if (userQueue.some(existing => existing.fullName.toLowerCase() === u.toLowerCase())) {
+                     failCount++;
+                     continue;
+                 }
 
                  let finalRole = 'Custom';
                  let perms = [];
@@ -1035,7 +1201,7 @@
 
              window.renderQueue();
              if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
-             alert(`นำเข้าเรียบร้อย: ${successCount} รายการ (จากไฟล์ Matrix)`);
+             window.showImportResult(successCount, failCount);
         }
 
         window.saveAdminUser = async function(e) {
