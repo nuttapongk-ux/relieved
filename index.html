@@ -322,7 +322,7 @@
         <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
             <!-- Sidebar -->
             <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">User</span></div></div></div>
+                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">คน</span></div></div></div>
             </div>
             <!-- Form -->
             <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
@@ -765,9 +765,12 @@
             
             const parentSelect = document.getElementById('newMenuParent');
             if(parentSelect && parentSelect.value) {
+                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
+                // Let's assume sub-menus can be mandatory too.
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             } else {
+                // If main menu
                 mandatoryContainer.classList.remove('opacity-50');
                 mandatoryCheck.disabled = false;
             }
@@ -1755,20 +1758,31 @@
         window.updateUserStatus = function(id, newStatus, currentBatchId) {
             // Find user info for notification
             const userRequest = requests.find(r => r.id === id);
+            const batchUsers = requests.filter(r => r.batchId === currentBatchId);
+            
+            // Check if this is the last pending user in the batch
+            const otherPending = batchUsers.filter(r => r.status === 'pending' && r.id !== id);
+            const isLastPending = otherPending.length === 0;
 
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), {
                 status: newStatus
             }).then(() => {
-                if (newStatus === 'completed' && userRequest) {
+                // Only send notification if status is completed AND it's the last pending user in this batch
+                if (newStatus === 'completed' && isLastPending && userRequest) {
                      const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
-                     // Format date safely
+                     
                      let requestDate = '-';
                      if(userRequest.createdAt) {
                         const dateObj = userRequest.createdAt.toDate ? userRequest.createdAt.toDate() : new Date(userRequest.createdAt.seconds * 1000);
                         requestDate = dateObj.toLocaleDateString('th-TH');
                      }
 
-                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n👤 *User:* ${userRequest.fullName}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
+                     const uniqueMerchants = [...new Set(batchUsers.map(u => `${u.merchantId} - ${u.merchantName}`))].join(', ');
+                     
+                     // If there's only 1 user, show their name. If multiple, show user count.
+                     let userDisplay = batchUsers.length === 1 ? `👤 *User:* ${userRequest.fullName}` : `👥 *จำนวน:* ${batchUsers.length} User`;
+
+                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${userDisplay}\n🏢 *ร้านค้า:* ${uniqueMerchants}\n📅 *วันที่แจ้ง:* ${requestDate}`;
                      
                      fetch(webhookUrl, { 
                          method: 'POST', 
