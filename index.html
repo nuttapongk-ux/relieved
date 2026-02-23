@@ -234,7 +234,7 @@
     <div id="validationModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
             <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-circle-exclamation text-orange-500 text-4xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อมูลไม่ครบถ้วน</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อความแจ้งเตือน</h3>
             <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="validationMessage">กรุณากรอกข้อมูลให้ครบถ้วน</p>
             <button onclick="window.closeValidationModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ตกลง</button>
         </div>
@@ -257,7 +257,7 @@
     <div id="detailModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: -</p></div></div>
+                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: - | Lead No: -</p></div></div>
                 <button onclick="window.closeDetailModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-slate-50">
@@ -296,7 +296,14 @@
                 <button onclick="window.closePreviewModal()" class="text-brand-200 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 bg-slate-50 custom-scrollbar">
-                <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6 shadow-sm"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">ข้อมูลร้านค้า (Merchant Info)</h4><div class="grid grid-cols-2 gap-4 text-sm"><div><span class="text-slate-500 block text-xs">Merchant ID</span> <span id="previewMerchantId" class="font-medium text-slate-800 text-lg">-</span></div><div><span class="text-slate-500 block text-xs">Merchant Name</span> <span id="previewMerchantName" class="font-medium text-slate-800 text-lg">-</span></div></div></div>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">ข้อมูลร้านค้า (Merchant Info)</h4>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div><span class="text-slate-500 block text-xs">Lead No</span> <span id="previewLeadNo" class="font-medium text-slate-800 text-lg">-</span></div>
+                        <div><span class="text-slate-500 block text-xs">Merchant ID</span> <span id="previewMerchantId" class="font-medium text-slate-800 text-lg">-</span></div>
+                        <div><span class="text-slate-500 block text-xs">Merchant Name</span> <span id="previewMerchantName" class="font-medium text-slate-800 text-lg">-</span></div>
+                    </div>
+                </div>
                 <div class="flex justify-between items-end mb-3"><h4 class="text-sm font-bold text-slate-700">รายการผู้ใช้งานที่จะสร้าง (<span id="previewUserCount">0</span>)</h4></div>
                 <div id="previewUserList" class="space-y-3"></div>
             </div>
@@ -329,7 +336,8 @@
                 <form id="requestForm" class="flex-1 overflow-y-auto pr-2 pb-24 scroll-smooth">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 sticky top-0 z-20 shadow-sm">
                          <h4 class="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-shop text-brand-500"></i> ข้อมูลร้านค้า (ใช้ร่วมกัน)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="block text-xs font-medium text-slate-700 mb-1">Lead No</label><input type="text" name="leadNo" required placeholder="ระบุ Lead No" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label><input type="text" name="merchantId" required placeholder="ระบุตัวเลข (สูงสุด 5 หลัก)" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" inputmode="numeric" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">ชื่อร้านค้า</label><input type="text" name="merchantName" placeholder="ระบุชื่อร้านค้า" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                         </div>
@@ -392,7 +400,7 @@
                 </div>
             </div>
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex gap-3">
-                <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i><input type="text" id="adminSearchInput" onkeyup="window.searchRequests()" placeholder="ค้นหาชื่อ, Merchant ID, Batch ID..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-brand-500"></div>
+                <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i><input type="text" id="adminSearchInput" onkeyup="window.searchRequests()" placeholder="ค้นหาชื่อ, Merchant ID, Batch ID, Lead No..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-brand-500"></div>
                 <div class="flex gap-2"><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users รออนุมัติ: <span id="pendingCount" class="font-bold text-yellow-500">0</span></div><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users อนุมัติแล้ว: <span id="approvedCount" class="font-bold text-green-500">0</span></div></div>
             </div>
             <div class="flex-1 overflow-x-auto p-4">
@@ -607,7 +615,8 @@
                     (req.merchantId && req.merchantId.toLowerCase().includes(searchTerm)) ||
                     (req.merchantName && req.merchantName.toLowerCase().includes(searchTerm)) ||
                     (req.batchId && req.batchId.toLowerCase().includes(searchTerm)) ||
-                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm))
+                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm)) ||
+                    (req.leadNo && req.leadNo.toLowerCase().includes(searchTerm))
                 );
             });
 
@@ -635,6 +644,7 @@
                         date: displayDate,
                         merchantId: req.merchantId,
                         merchantName: req.merchantName,
+                        leadNo: req.leadNo || '-',
                         totalUsers: 0,
                         pendingUsers: 0,
                         approvedUsers: 0,
@@ -666,7 +676,8 @@
                     <td class="p-4 text-slate-500">${batch.date}</td>
                     <td class="p-4">
                         <div class="font-medium text-slate-800 max-w-[200px] truncate" title="${batch.merchantId}">${batch.merchantId}</div>
-                        <div class="text-xs text-slate-500 max-w-[200px] truncate" title="${batch.merchantName}">${batch.merchantName}</div>
+                        <div class="text-[10px] text-brand-600 font-bold mt-0.5">Lead: ${batch.leadNo}</div>
+                        <div class="text-xs text-slate-500 max-w-[200px] truncate mt-0.5" title="${batch.merchantName}">${batch.merchantName}</div>
                         <div class="text-[10px] text-slate-400 mt-1">Ref: ${batch.batchId}</div>
                     </td>
                     <td class="p-4 text-center">
@@ -874,10 +885,9 @@
         }
         // ------------------------------------
         
-        // --- NEW: Multiple Merchant Logic ---
+        // --- IMPORT CSV FUNCTIONALITY ---
         window.openImportModal = function() {
             document.getElementById('importModal').classList.remove('hidden');
-            // Reset
             currentImportFile = null;
             document.getElementById('importFile').value = '';
             document.getElementById('importFileName').classList.add('hidden');
@@ -952,7 +962,6 @@
              document.getElementById('importResultModal').classList.add('hidden');
         }
 
-        // --- IMPORT CSV FUNCTIONALITY ---
         window.processSimpleCSV = function(text) {
             const lines = text.split('\n');
             let successCount = 0;
@@ -1046,6 +1055,11 @@
 
              // EXTRACT MERCHANT INFO
              for(const line of lines) {
+                 if (line.startsWith("Lead No,")) {
+                     let valuePart = line.substring("Lead No,".length);
+                     const val = parseCSVValue(valuePart);
+                     if(val && val !== '-') document.querySelector('input[name="leadNo"]').value = val;
+                 }
                  if (line.startsWith("Merchant ID,")) {
                      let valuePart = line.substring("Merchant ID,".length);
                      const val = parseCSVValue(valuePart);
@@ -1484,19 +1498,28 @@
         window.addToQueue = function() {
              const nameInput = document.getElementById('inputName');
              const emailInput = document.getElementById('inputEmail');
+             const leadNoInput = document.querySelector('input[name="leadNo"]');
              const merchantIdInput = document.querySelector('input[name="merchantId"]');
              const merchantNameInput = document.querySelector('input[name="merchantName"]');
              
              // Reset styles first
              nameInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
              emailInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+             leadNoInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
              merchantIdInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
 
              const name = nameInput.value.trim();
              const email = emailInput.value.trim();
+             const leadNo = leadNoInput.value.trim();
              const merchantId = merchantIdInput.value.trim();
              const merchantName = merchantNameInput.value.trim();
              
+             if(!leadNo) { 
+                 window.showValidationModal('กรุณาระบุ Lead No');
+                 leadNoInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                 leadNoInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
+                 return; 
+             }
              if(!merchantId) { 
                  window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
                  merchantIdInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
@@ -1565,12 +1588,11 @@
              window.renderQueue();
              document.getElementById('inputName').value = '';
              document.getElementById('inputEmail').value = '';
-             // Keep merchant ID for convenience or clear it? Better keep it for batch entry of same merchant.
              
              document.getElementById('queueSection').classList.remove('hidden');
              
-             // Reset Roles & Permissions (Keep mandatory)
-             window.toggleAll(false, false);
+             // Reset Roles & Permissions (Set clearRoles to true)
+             window.toggleAll(false, true);
         }
         
         window.removeFromQueue = function(id) { userQueue = userQueue.filter(u => u.tempId !== id); window.renderQueue(); }
@@ -1581,8 +1603,11 @@
             window.toggleAll(false, true); 
             
             // Clear Merchant Inputs
+            const leadNoInput = document.querySelector('input[name="leadNo"]');
             const merchantIdInput = document.querySelector('input[name="merchantId"]');
             const merchantNameInput = document.querySelector('input[name="merchantName"]');
+            
+            if (leadNoInput) leadNoInput.value = '';
             if (merchantIdInput) merchantIdInput.value = '';
             if (merchantNameInput) merchantNameInput.value = '';
             
@@ -1600,8 +1625,6 @@
             const item = userQueue.find(u => u.tempId === tempId);
             if (!item) return;
 
-            document.querySelector('input[name="merchantId"]').value = item.merchantId;
-            document.querySelector('input[name="merchantName"]').value = item.merchantName;
             document.getElementById('inputName').value = item.fullName;
             document.getElementById('inputEmail').value = item.email;
 
@@ -1697,17 +1720,15 @@
              window.updateStats();
         }
         
-        window.confirmSubmission = function() {
+        window.confirmSubmission = async function() {
+             const leadNo = document.querySelector('input[name="leadNo"]').value.trim();
              const merchantId = document.querySelector('input[name="merchantId"]').value;
              const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
              const batchId = 'B-' + Date.now();
 
-             if(!merchantId) { 
-                 window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
-                 return; 
-             }
+             if(!leadNo) { window.showValidationModal('กรุณาระบุ Lead No'); return; }
+             if(!merchantId) { window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)'); return; }
              
-             // --- FIX: Add Loading State to btnRealSubmit ---
              const btn = document.getElementById('btnRealSubmit');
              const originalBtnContent = btn ? btn.innerHTML : '';
              if(btn) {
@@ -1715,9 +1736,11 @@
                  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังส่งข้อมูล...';
              }
 
+             // --- Firebase Save Logic ---
              const promises = userQueue.map(u => {
                  return addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), {
                      ...u, 
+                     leadNo: leadNo,
                      merchantId: merchantId,
                      merchantName: merchantName,
                      batchId, 
@@ -1727,9 +1750,15 @@
              });
 
              Promise.all(promises).then(() => {
+                 // GChat notification formatting
                  const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
-                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
-                 fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8' }, body: JSON.stringify({ text: messageText }) }).catch(err => console.error("Error sending notification:", err));
+                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n📋 *Lead No:* ${leadNo}\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
+                 
+                 fetch(webhookUrl, { 
+                     method: 'POST', 
+                     headers: { 'Content-Type': 'application/json; charset=UTF-8' }, 
+                     body: JSON.stringify({ text: messageText }) 
+                 }).catch(err => console.log("ℹ️ ส่งแจ้งเตือน GChat (ข้อมูลส่งไปแล้ว แต่ Browser อ่านค่ากลับไม่ได้):", err.message));
 
                  window.closePreviewModal();
                  window.resetAll();
@@ -1741,7 +1770,7 @@
                  }
              }).catch(err => {
                  console.error("Submission Error:", err);
-                 alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
              }).finally(() => {
                  if(btn) {
                      btn.disabled = false;
@@ -1756,18 +1785,15 @@
         
         // --- ADDED MISSING FUNCTIONS FOR DETAIL MODAL ---
         window.updateUserStatus = function(id, newStatus, currentBatchId) {
-            // Find user info for notification
             const userRequest = requests.find(r => r.id === id);
             const batchUsers = requests.filter(r => r.batchId === currentBatchId);
             
-            // Check if this is the last pending user in the batch
             const otherPending = batchUsers.filter(r => r.status === 'pending' && r.id !== id);
             const isLastPending = otherPending.length === 0;
 
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), {
                 status: newStatus
             }).then(() => {
-                // Only send notification if status is completed AND it's the last pending user in this batch
                 if (newStatus === 'completed' && isLastPending && userRequest) {
                      const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
                      
@@ -1777,18 +1803,16 @@
                         requestDate = dateObj.toLocaleDateString('th-TH');
                      }
 
-                     const uniqueMerchants = [...new Set(batchUsers.map(u => `${u.merchantId} - ${u.merchantName}`))].join(', ');
-                     
-                     // If there's only 1 user, show their name. If multiple, show user count.
+                     const leadDisplay = userRequest.leadNo ? `📋 *Lead No:* ${userRequest.leadNo}\n` : '';
                      let userDisplay = batchUsers.length === 1 ? `👤 *User:* ${userRequest.fullName}` : `👥 *จำนวน:* ${batchUsers.length} User`;
 
-                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${userDisplay}\n🏢 *ร้านค้า:* ${uniqueMerchants}\n📅 *วันที่แจ้ง:* ${requestDate}`;
+                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${leadDisplay}${userDisplay}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
                      
                      fetch(webhookUrl, { 
                          method: 'POST', 
                          headers: { 'Content-Type': 'application/json; charset=UTF-8' }, 
                          body: JSON.stringify({ text: messageText }) 
-                     }).catch(err => console.error("Error sending notification:", err));
+                     }).catch(err => console.log("ℹ️ ส่งแจ้งเตือนสถานะ GChat (ข้อมูลส่งไปแล้ว แต่ Browser อ่านค่ากลับไม่ได้):", err.message));
                 }
                 window.openDetailModal(currentBatchId);
             });
@@ -1817,15 +1841,7 @@
             const batchUsers = requests.filter(r => r.batchId === batchId);
             if(batchUsers.length === 0) return;
             const first = batchUsers[0];
-            
-            // Check for mixed merchants
-            const uniqueMerchants = [...new Set(batchUsers.map(u => u.merchantId))];
-            let displayMerchant = `${first.merchantId} - ${first.merchantName}`;
-            if (uniqueMerchants.length > 1) {
-                displayMerchant = "Multiple Merchants (คละร้านค้า)";
-            }
 
-            // Fix Date display
             let displayDate = '-';
             if(first.createdAt) {
                  const dateObj = first.createdAt.toDate ? first.createdAt.toDate() : new Date(first.createdAt.seconds * 1000);
@@ -1833,9 +1849,11 @@
                     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
             }
+            
+            const displayLeadNo = first.leadNo || '-';
 
-            document.getElementById('modalMerchantName').textContent = displayMerchant;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
+            document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
+            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Lead No: ${displayLeadNo}`;
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
@@ -1875,6 +1893,7 @@
             // 2. Merchant Info Header (Matching User's Format)
             csvContent += `--- Merchant Information ---\n`;
             csvContent += `Batch ID,${firstReq.batchId}\n`;
+            csvContent += `Lead No,${firstReq.leadNo || '-'}\n`;
             csvContent += `Date,${createdDate}\n`;
             csvContent += `Merchant ID,"${firstReq.merchantId || '-'}"\n`;
             csvContent += `Merchant Name,"${firstReq.merchantName || '-'}"\n`;
@@ -1925,7 +1944,21 @@
         window.editUser = function(id) { const user = requests.find(r => r.id === id); if (!user) return; document.getElementById('editUserId').value = user.id; document.getElementById('editName').value = user.fullName; document.getElementById('editEmail').value = user.email; const roleRadios = document.querySelectorAll('input[name="editRole"]'); let roleFound = false; roleRadios.forEach(r => { if (r.value === user.role) { r.checked = true; roleFound = true; } }); if(!roleFound) { roleRadios.forEach(r => r.checked = false); } const editCheckboxes = document.querySelectorAll('input[name="editPermissions"]'); editCheckboxes.forEach(cb => { const pid = parseInt(cb.value); cb.checked = user.permissions.includes(pid); const item = menuItems.find(m => m.id === pid); if (item && item.mandatory) { cb.checked = true; } }); document.getElementById('editUserModal').classList.remove('hidden'); }
         window.closeEditModal = function() { document.getElementById('editUserModal').classList.add('hidden'); }
         window.saveUserChanges = function() { const id = document.getElementById('editUserId').value; const originalUser = requests.find(r => r.id === id); if (originalUser) { let role = 'Custom'; const roleRadio = document.querySelector('input[name="editRole"]:checked'); if (roleRadio) role = roleRadio.value; let permissions = []; document.querySelectorAll('input[name="editPermissions"]:checked').forEach(cb => { permissions.push(parseInt(cb.value)); }); permissions = cleanPermissions(permissions); const updates = { fullName: document.getElementById('editName').value, email: document.getElementById('editEmail').value, role: role, permissions: permissions, permissionCount: permissions.length }; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), updates).then(() => { window.closeEditModal(); window.openDetailModal(originalUser.batchId); }); } }
-        window.openPreviewModal = function() { const merchantId = document.querySelector('input[name="merchantId"]').value; const merchantName = document.querySelector('input[name="merchantName"]').value || '-'; document.getElementById('previewMerchantId').textContent = merchantId; document.getElementById('previewMerchantName').textContent = merchantName; document.getElementById('previewUserCount').textContent = userQueue.length; const previewUserList = document.getElementById('previewUserList'); previewUserList.innerHTML = ''; const displayItems = getSortedMenuItems(); userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
+        window.openPreviewModal = function() { 
+            const leadNo = document.querySelector('input[name="leadNo"]').value;
+            const merchantId = document.querySelector('input[name="merchantId"]').value;
+            const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
+            
+            document.getElementById('previewLeadNo').textContent = leadNo || '-';
+            document.getElementById('previewMerchantId').textContent = merchantId;
+            document.getElementById('previewMerchantName').textContent = merchantName;
+            document.getElementById('previewUserCount').textContent = userQueue.length;
+
+            const previewUserList = document.getElementById('previewUserList');
+            previewUserList.innerHTML = '';
+            
+            const displayItems = getSortedMenuItems();
+            userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
         window.closePreviewModal = function() { document.getElementById('previewModal').classList.add('hidden'); }
 
         // Initial Renders (FORCE RENDER TO SHOW DEFAULT DATA IMMEDIATELY)
