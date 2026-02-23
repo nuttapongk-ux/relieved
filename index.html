@@ -258,7 +258,7 @@
     <div id="detailModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: - | Date: -</p></div></div>
+                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: -</p></div></div>
                 <button onclick="window.closeDetailModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-slate-50">
@@ -282,11 +282,7 @@
                 <form id="editUserForm" class="space-y-4">
                     <input type="hidden" id="editUserId">
                     <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"><h4 class="text-xs font-bold text-slate-400 uppercase mb-3">ข้อมูลส่วนตัว</h4><div class="grid grid-cols-2 gap-4"><div class="col-span-2"><label class="block text-xs font-medium text-slate-700 mb-1">Username</label><input type="text" id="editName" class="w-full px-3 py-2 rounded border border-slate-300 text-sm focus:border-brand-500 outline-none"></div><div class="col-span-2"><label class="block text-xs font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="editEmail" class="w-full px-3 py-2 rounded border border-slate-300 text-sm focus:border-brand-500 outline-none"></div></div></div>
-                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-3">สิทธิ์การใช้งาน</h4>
-                        <div class="mb-4"><label class="block text-xs font-medium text-slate-700 mb-2">บทบาท (Role)</label><div id="editRoleGrid" class="grid grid-cols-4 gap-2"></div></div>
-                        <div class="border-t border-slate-100 pt-3"><div class="flex justify-between items-center mb-2"><label class="text-xs font-medium text-slate-700">เลือกเมนูรายตัว</label><div class="flex gap-2"><button type="button" onclick="window.toggleEditAll(true)" class="text-[10px] text-brand-600 bg-brand-50 px-2 py-1 rounded">เลือกทั้งหมด</button><button type="button" onclick="window.toggleEditAll(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded">ล้าง</button></div></div><div class="grid grid-cols-2 gap-2 text-xs" id="editPermissionGrid"></div></div>
-                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"><h4 class="text-xs font-bold text-slate-400 uppercase mb-3">สิทธิ์การใช้งาน</h4><div class="mb-4"><label class="block text-xs font-medium text-slate-700 mb-2">บทบาท (Role)</label><div id="editRoleGrid" class="grid grid-cols-4 gap-2"></div></div><div class="border-t border-slate-100 pt-3"><div class="flex justify-between items-center mb-2"><label class="text-xs font-medium text-slate-700">เลือกเมนูรายตัว</label><div class="flex gap-2"><button type="button" onclick="window.toggleEditAll(true)" class="text-[10px] text-brand-600 bg-brand-50 px-2 py-1 rounded">เลือกทั้งหมด</button><button type="button" onclick="window.toggleEditAll(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded">ล้าง</button></div></div><div class="grid grid-cols-2 gap-2 text-xs" id="editPermissionGrid"></div></div></div>
                 </form>
             </div>
             <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3"><button onclick="window.closeEditModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ยกเลิก</button><button onclick="window.saveUserChanges()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกการแก้ไข</button></div>
@@ -647,8 +643,7 @@
                     (req.merchantId && req.merchantId.toLowerCase().includes(searchTerm)) ||
                     (req.merchantName && req.merchantName.toLowerCase().includes(searchTerm)) ||
                     (req.batchId && req.batchId.toLowerCase().includes(searchTerm)) ||
-                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm)) ||
-                    (req.leadNo && req.leadNo.toLowerCase().includes(searchTerm))
+                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm))
                 );
             });
 
@@ -676,7 +671,6 @@
                         date: displayDate,
                         merchantId: req.merchantId,
                         merchantName: req.merchantName,
-                        leadNo: req.leadNo || '-',
                         totalUsers: 0,
                         pendingUsers: 0,
                         approvedUsers: 0,
@@ -1614,7 +1608,9 @@
              document.getElementById('inputEmail').value = '';
              
              document.getElementById('queueSection').classList.remove('hidden');
-             window.toggleAll(false, false);
+             
+             // Reset Roles & Permissions (Set clearRoles to true)
+             window.toggleAll(false, true);
         }
         
         window.removeFromQueue = function(id) { userQueue = userQueue.filter(u => u.tempId !== id); window.renderQueue(); }
