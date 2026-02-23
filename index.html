@@ -257,7 +257,7 @@
     <div id="detailModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: - | Lead No: -</p></div></div>
+                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: - | Date: -</p></div></div>
                 <button onclick="window.closeDetailModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             <div class="p-0 overflow-y-auto flex-1 bg-slate-50">
@@ -298,8 +298,7 @@
             <div class="p-6 overflow-y-auto flex-1 bg-slate-50 custom-scrollbar">
                 <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6 shadow-sm">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">ข้อมูลร้านค้า (Merchant Info)</h4>
-                    <div class="grid grid-cols-3 gap-4 text-sm">
-                        <div><span class="text-slate-500 block text-xs">Lead No</span> <span id="previewLeadNo" class="font-medium text-slate-800 text-lg">-</span></div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
                         <div><span class="text-slate-500 block text-xs">Merchant ID</span> <span id="previewMerchantId" class="font-medium text-slate-800 text-lg">-</span></div>
                         <div><span class="text-slate-500 block text-xs">Merchant Name</span> <span id="previewMerchantName" class="font-medium text-slate-800 text-lg">-</span></div>
                     </div>
@@ -336,8 +335,7 @@
                 <form id="requestForm" class="flex-1 overflow-y-auto pr-2 pb-24 scroll-smooth">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 sticky top-0 z-20 shadow-sm">
                          <h4 class="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-shop text-brand-500"></i> ข้อมูลร้านค้า (ใช้ร่วมกัน)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">Lead No</label><input type="text" name="leadNo" required placeholder="ระบุ Lead No" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label><input type="text" name="merchantId" required placeholder="ระบุตัวเลข (สูงสุด 5 หลัก)" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" inputmode="numeric" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm"></div>
                             <div><label class="block text-xs font-medium text-slate-700 mb-1">ชื่อร้านค้า</label><input type="text" name="merchantName" placeholder="ระบุชื่อร้านค้า" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
                         </div>
@@ -400,7 +398,7 @@
                 </div>
             </div>
             <div class="p-4 border-b border-slate-100 bg-slate-50 flex gap-3">
-                <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i><input type="text" id="adminSearchInput" onkeyup="window.searchRequests()" placeholder="ค้นหาชื่อ, Merchant ID, Batch ID, Lead No..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-brand-500"></div>
+                <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i><input type="text" id="adminSearchInput" onkeyup="window.searchRequests()" placeholder="ค้นหาชื่อ, Merchant ID, Batch ID..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-brand-500"></div>
                 <div class="flex gap-2"><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users รออนุมัติ: <span id="pendingCount" class="font-bold text-yellow-500">0</span></div><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users อนุมัติแล้ว: <span id="approvedCount" class="font-bold text-green-500">0</span></div></div>
             </div>
             <div class="flex-1 overflow-x-auto p-4">
@@ -615,8 +613,7 @@
                     (req.merchantId && req.merchantId.toLowerCase().includes(searchTerm)) ||
                     (req.merchantName && req.merchantName.toLowerCase().includes(searchTerm)) ||
                     (req.batchId && req.batchId.toLowerCase().includes(searchTerm)) ||
-                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm)) ||
-                    (req.leadNo && req.leadNo.toLowerCase().includes(searchTerm))
+                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm))
                 );
             });
 
@@ -644,7 +641,6 @@
                         date: displayDate,
                         merchantId: req.merchantId,
                         merchantName: req.merchantName,
-                        leadNo: req.leadNo || '-',
                         totalUsers: 0,
                         pendingUsers: 0,
                         approvedUsers: 0,
@@ -676,8 +672,7 @@
                     <td class="p-4 text-slate-500">${batch.date}</td>
                     <td class="p-4">
                         <div class="font-medium text-slate-800 max-w-[200px] truncate" title="${batch.merchantId}">${batch.merchantId}</div>
-                        <div class="text-[10px] text-brand-600 font-bold mt-0.5">Lead: ${batch.leadNo}</div>
-                        <div class="text-xs text-slate-500 max-w-[200px] truncate mt-0.5" title="${batch.merchantName}">${batch.merchantName}</div>
+                        <div class="text-xs text-slate-500 max-w-[200px] truncate" title="${batch.merchantName}">${batch.merchantName}</div>
                         <div class="text-[10px] text-slate-400 mt-1">Ref: ${batch.batchId}</div>
                     </td>
                     <td class="p-4 text-center">
@@ -1055,11 +1050,6 @@
 
              // EXTRACT MERCHANT INFO
              for(const line of lines) {
-                 if (line.startsWith("Lead No,")) {
-                     let valuePart = line.substring("Lead No,".length);
-                     const val = parseCSVValue(valuePart);
-                     if(val && val !== '-') document.querySelector('input[name="leadNo"]').value = val;
-                 }
                  if (line.startsWith("Merchant ID,")) {
                      let valuePart = line.substring("Merchant ID,".length);
                      const val = parseCSVValue(valuePart);
@@ -1498,28 +1488,19 @@
         window.addToQueue = function() {
              const nameInput = document.getElementById('inputName');
              const emailInput = document.getElementById('inputEmail');
-             const leadNoInput = document.querySelector('input[name="leadNo"]');
              const merchantIdInput = document.querySelector('input[name="merchantId"]');
              const merchantNameInput = document.querySelector('input[name="merchantName"]');
              
              // Reset styles first
              nameInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
              emailInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-             leadNoInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
              merchantIdInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
 
              const name = nameInput.value.trim();
              const email = emailInput.value.trim();
-             const leadNo = leadNoInput.value.trim();
              const merchantId = merchantIdInput.value.trim();
              const merchantName = merchantNameInput.value.trim();
              
-             if(!leadNo) { 
-                 window.showValidationModal('กรุณาระบุ Lead No');
-                 leadNoInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                 leadNoInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                 return; 
-             }
              if(!merchantId) { 
                  window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
                  merchantIdInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
@@ -1603,11 +1584,9 @@
             window.toggleAll(false, true); 
             
             // Clear Merchant Inputs
-            const leadNoInput = document.querySelector('input[name="leadNo"]');
             const merchantIdInput = document.querySelector('input[name="merchantId"]');
             const merchantNameInput = document.querySelector('input[name="merchantName"]');
             
-            if (leadNoInput) leadNoInput.value = '';
             if (merchantIdInput) merchantIdInput.value = '';
             if (merchantNameInput) merchantNameInput.value = '';
             
@@ -1721,12 +1700,10 @@
         }
         
         window.confirmSubmission = async function() {
-             const leadNo = document.querySelector('input[name="leadNo"]').value.trim();
              const merchantId = document.querySelector('input[name="merchantId"]').value;
              const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
              const batchId = 'B-' + Date.now();
 
-             if(!leadNo) { window.showValidationModal('กรุณาระบุ Lead No'); return; }
              if(!merchantId) { window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)'); return; }
              
              const btn = document.getElementById('btnRealSubmit');
@@ -1740,7 +1717,6 @@
              const promises = userQueue.map(u => {
                  return addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), {
                      ...u, 
-                     leadNo: leadNo,
                      merchantId: merchantId,
                      merchantName: merchantName,
                      batchId, 
@@ -1752,7 +1728,7 @@
              Promise.all(promises).then(() => {
                  // GChat notification formatting
                  const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
-                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n📋 *Lead No:* ${leadNo}\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
+                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
                  
                  fetch(webhookUrl, { 
                      method: 'POST', 
@@ -1803,10 +1779,9 @@
                         requestDate = dateObj.toLocaleDateString('th-TH');
                      }
 
-                     const leadDisplay = userRequest.leadNo ? `📋 *Lead No:* ${userRequest.leadNo}\n` : '';
                      let userDisplay = batchUsers.length === 1 ? `👤 *User:* ${userRequest.fullName}` : `👥 *จำนวน:* ${batchUsers.length} User`;
 
-                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${leadDisplay}${userDisplay}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
+                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${userDisplay}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
                      
                      fetch(webhookUrl, { 
                          method: 'POST', 
@@ -1850,10 +1825,8 @@
                 });
             }
             
-            const displayLeadNo = first.leadNo || '-';
-
             document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Lead No: ${displayLeadNo}`;
+            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
             const modalTableBody = document.getElementById('modalTableBody');
             modalTableBody.innerHTML = '';
             batchUsers.forEach(u => {
@@ -1893,7 +1866,6 @@
             // 2. Merchant Info Header (Matching User's Format)
             csvContent += `--- Merchant Information ---\n`;
             csvContent += `Batch ID,${firstReq.batchId}\n`;
-            csvContent += `Lead No,${firstReq.leadNo || '-'}\n`;
             csvContent += `Date,${createdDate}\n`;
             csvContent += `Merchant ID,"${firstReq.merchantId || '-'}"\n`;
             csvContent += `Merchant Name,"${firstReq.merchantName || '-'}"\n`;
@@ -1945,11 +1917,9 @@
         window.closeEditModal = function() { document.getElementById('editUserModal').classList.add('hidden'); }
         window.saveUserChanges = function() { const id = document.getElementById('editUserId').value; const originalUser = requests.find(r => r.id === id); if (originalUser) { let role = 'Custom'; const roleRadio = document.querySelector('input[name="editRole"]:checked'); if (roleRadio) role = roleRadio.value; let permissions = []; document.querySelectorAll('input[name="editPermissions"]:checked').forEach(cb => { permissions.push(parseInt(cb.value)); }); permissions = cleanPermissions(permissions); const updates = { fullName: document.getElementById('editName').value, email: document.getElementById('editEmail').value, role: role, permissions: permissions, permissionCount: permissions.length }; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), updates).then(() => { window.closeEditModal(); window.openDetailModal(originalUser.batchId); }); } }
         window.openPreviewModal = function() { 
-            const leadNo = document.querySelector('input[name="leadNo"]').value;
             const merchantId = document.querySelector('input[name="merchantId"]').value;
             const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
             
-            document.getElementById('previewLeadNo').textContent = leadNo || '-';
             document.getElementById('previewMerchantId').textContent = merchantId;
             document.getElementById('previewMerchantName').textContent = merchantName;
             document.getElementById('previewUserCount').textContent = userQueue.length;
