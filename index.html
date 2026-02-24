@@ -1042,6 +1042,7 @@
                         const rolePerms = rolePermissions[matchedRole];
                         perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
                     } else {
+                         role = 'Custom';
                          perms = menuItems.filter(m => m.mandatory).map(m => m.id);
                     }
 
@@ -1087,6 +1088,11 @@
 
              // EXTRACT MERCHANT INFO
              for(const line of lines) {
+                 if (line.startsWith("Lead No,")) {
+                     let valuePart = line.substring("Lead No,".length);
+                     const val = parseCSVValue(valuePart);
+                     if(val && val !== '-') document.querySelector('input[name="leadNo"]').value = val;
+                 }
                  if (line.startsWith("Merchant ID,")) {
                      let valuePart = line.substring("Merchant ID,".length);
                      const val = parseCSVValue(valuePart);
@@ -1131,6 +1137,47 @@
                   return;
              }
              
+             // NEW: Parse Permission Matrix if it exists
+             let hasMatrix = false;
+             let matrixStartIndex = lines.findIndex(l => l.includes("--- Permission Access Matrix"));
+             let userMatrixPerms = Array(usernames.length).fill().map(() => []);
+
+             if (matrixStartIndex !== -1) {
+                 hasMatrix = true;
+                 for (let i = matrixStartIndex + 2; i < lines.length; i++) {
+                     let line = lines[i].trim();
+                     if (!line) continue;
+                     
+                     let menuName = '';
+                     let valuesStr = '';
+                     if (line.startsWith('"')) {
+                         let closeQuote = line.indexOf('"', 1);
+                         if(closeQuote !== -1) {
+                             menuName = line.substring(1, closeQuote);
+                             valuesStr = line.substring(closeQuote + 2);
+                         }
+                     } else {
+                         let firstComma = line.indexOf(',');
+                         if(firstComma !== -1) {
+                             menuName = line.substring(0, firstComma).trim();
+                             valuesStr = line.substring(firstComma + 1);
+                         }
+                     }
+                     
+                     if(!menuName) continue;
+                     
+                     let matchedMenu = menuItems.find(m => m.name === menuName);
+                     if (matchedMenu) {
+                         let values = valuesStr.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                         for(let u = 0; u < usernames.length; u++) {
+                             if (values[u] === '1') {
+                                 userMatrixPerms[u].push(matchedMenu.id);
+                             }
+                         }
+                     }
+                 }
+             }
+             
              let successCount = 0;
              let failCount = 0;
              const merchantId = document.querySelector('input[name="merchantId"]').value;
@@ -1156,13 +1203,39 @@
                  let finalRole = 'Custom';
                  let perms = [];
                  const matchedRole = Object.keys(rolePermissions).find(k => k.toLowerCase() === r.toLowerCase());
-                 if (matchedRole) {
-                     finalRole = matchedRole;
-                     const rolePerms = rolePermissions[matchedRole];
-                     perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
+                 
+                 if (hasMatrix) {
+                     // If matrix is found in CSV, strictly follow the matrix permissions for each user
+                     perms = userMatrixPerms[i] || [];
+                     if (matchedRole) {
+                         finalRole = matchedRole;
+                     } else {
+                         finalRole = 'Custom';
+                     }
                  } else {
-                      perms = menuItems.filter(m => m.mandatory).map(m => m.id);
+                     // Fallback to Role preset if no matrix exists
+                     if (matchedRole) {
+                         finalRole = matchedRole;
+                         const rolePerms = rolePermissions[matchedRole];
+                         perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
+                     } else {
+                          finalRole = 'Custom';
+                          perms = menuItems.filter(m => m.mandatory).map(m => m.id);
+                     }
                  }
+
+                 // Ensure mandatory menus are ALWAYS included
+                 let permSet = new Set(perms);
+                 const parents = menuItems.filter(m => m.type === 'header');
+                 parents.forEach(p => {
+                     const children = menuItems.filter(c => c.parentId === p.id);
+                     if(children.length > 0) {
+                         const hasChild = children.some(c => permSet.has(c.id));
+                         if(!hasChild) permSet.delete(p.id); else permSet.add(p.id);
+                     }
+                 });
+                 menuItems.forEach(m => { if(m.mandatory) permSet.add(m.id); });
+                 perms = Array.from(permSet);
 
                  userQueue.push({
                      tempId: Date.now() + i,
@@ -1764,7 +1837,7 @@
 
              Promise.all(promises).then(() => {
                  // GChat notification formatting
-                 const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAAAkm33LQY/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=RhINC5xizhv7M6GUjPXEvZ577nDNjE9-JDyNl4cc5HU";
+                 const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
                  const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
                  
                  fetch(webhookUrl, { 
@@ -1808,7 +1881,7 @@
                 status: newStatus
             }).then(() => {
                 if (newStatus === 'completed' && isLastPending && userRequest) {
-                     const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAAAkm33LQY/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=RhINC5xizhv7M6GUjPXEvZ577nDNjE9-JDyNl4cc5HU";
+                     const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAQA0QTVPFg/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=eF1t1W0HzQRjTG9RY11yFR0XNyVwGaQatRPLnwjmWtY";
                      
                      let requestDate = '-';
                      if(userRequest.createdAt) {
@@ -2007,4 +2080,3 @@
     </script>
 </body>
 </html>
-
