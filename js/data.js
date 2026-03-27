@@ -67,15 +67,7 @@ function findMenuById(id) {
 
 
 
-const MERCHANTS = [
-  { id: 'MCH001', name: 'ร้านค้า A – บางรัก' },
-  { id: 'MCH002', name: 'ร้านค้า B – สาทร' },
-  { id: 'MCH003', name: 'ร้านค้า C – ลาดกระบัง' },
-  { id: 'MCH004', name: 'ร้านค้า D – นนทบุรี' },
-  { id: 'MCH005', name: 'ร้านค้า E – เชียงใหม่' },
-  { id: 'MCH006', name: 'ร้านค้า F – ขอนแก่น' },
-  { id: 'MCH007', name: 'ร้านค้า G – ภูเก็ต' },
-];
+
 
 const ROLES = [
   {
@@ -125,20 +117,10 @@ const REQUEST_STATUS = {
   REJECTED: { label: 'ปฏิเสธ', color: '#ef4444', icon: '❌' },
 };
 
-// Storage helpers
-const STORAGE_KEY = 'merchant_rs_requests';
-
+// All requests are loaded from Firebase (window._latestRequests)
+// Use this helper to get the current snapshot synchronously
 function loadRequests() {
-  if (window._latestRequests) return window._latestRequests;
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveRequests(requests) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+  return window._latestRequests || [];
 }
 
 function generateId() {

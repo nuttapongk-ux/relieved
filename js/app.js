@@ -734,7 +734,16 @@ function openDetailModal(id) {
   _currentDetailId = id;
   const requests = loadRequests();
   const r = requests.find(req => req.id === id);
-  if (!r) return;
+  if (!r) {
+    // Data may not be in snapshot yet — try fetching directly
+    fbLoadRequests().then(reqs => {
+      window._latestRequests = reqs;
+      const found = reqs.find(req => req.id === id);
+      if (found) openDetailModal(id);
+      else showToast('ไม่พบรายการ Request', 'error');
+    });
+    return;
+  }
 
   const reqType = REQUEST_TYPES.find(t => t.id === r.requestType);
   const role = ROLES.find(ro => ro.id === r.roleId);
@@ -990,10 +999,6 @@ async function submitRequest() {
 
   try {
     await fbSaveRequest(newReq);
-    // Also keep local copy as backup
-    const localRequests = loadRequests();
-    localRequests.push(newReq);
-    saveRequests(localRequests);
 
     // Show success
     document.getElementById('page-new_request-inner').classList.add('hidden');
@@ -1056,36 +1061,7 @@ function initFilters() {
   if (typeFilter) typeFilter.addEventListener('change', e => { filterType = e.target.value; renderRequestList(); });
 }
 
-// ── Seed Demo Data ──
-function seedDemoData() {
-  // Check Firebase first; seed only if empty
-  fbLoadRequests().then(existing => {
-    if (existing.length > 0) return; // Already has data in Firebase
-    if (loadRequests().length > 0) return; // Already has local data
-    const demo = [
-      {
-        requestType: 'CREATE_USER', merchantId: 'MCH001', merchantName: 'ร้านค้า A – บางรัก', requesterName: 'สมชาย ใจดี', requesterEmail: 'somchai@example.com', department: 'IT', position: 'System Admin',
-        users: [{ username: 'john.doe', fullname: 'John Doe', email: 'john@mch001.com', roleId: 'ROLE_CASHIER' }, { username: 'jane.doe', fullname: 'Jane Doe', email: 'jane@mch001.com', roleId: 'ROLE_REPORT' }],
-        reason: 'พนักงานใหม่ต้องการเข้าระบบ', status: 'PENDING', createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
-      },
-      {
-        requestType: 'ASSIGN_ROLE', merchantId: 'MCH002', merchantName: 'ร้านค้า B – สาทร', requesterName: 'มาลี สวยงาม', requesterEmail: 'malee@example.com', department: 'Operations', position: 'Manager',
-        users: [{ username: 'sarah.k', fullname: 'Sarah K.', email: 'sarah@mch002.com', roleId: 'ROLE_MGR' }],
-        reason: 'ปรับตำแหน่งเป็น Manager', status: 'COMPLETED', completedAt: new Date(Date.now() - 86400000).toISOString(), createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
-      },
-      {
-        requestType: 'REVOKE_ACCESS', merchantId: 'MCH003', merchantName: 'ร้านค้า C – ลาดกระบัง', requesterName: 'วิชัย เก่งมาก', requesterEmail: 'wichai@example.com', department: 'HR', position: 'HR Officer',
-        users: [{ username: 'old.staff', fullname: 'Old Staff', email: 'old@mch003.com', roleId: '' }],
-        reason: 'พนักงานลาออก', status: 'PENDING', createdAt: new Date(Date.now() - 86400000 * 1).toISOString()
-      },
-    ].map(r => ({ ...r, id: generateId(), updatedAt: r.createdAt }));
 
-    // Save each demo request to Firebase
-    Promise.all(demo.map(r => fbSaveRequest(r))).then(() => {
-      console.log('Demo data seeded to Firebase.');
-    }).catch(err => console.error('Seed error:', err));
-  }); // end .then
-} // end seedDemoData
 
 // ============================================================
 // IMPORT EXCEL / CSV — Matrix format
@@ -1236,7 +1212,6 @@ function importExcelFile(input) {
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
-  seedDemoData();
   initRoleCards();
   initFilters();
   updateSidebarAuth(); // set login/logout state in sidebar
@@ -1258,14 +1233,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   fbListenSettings('menuGroups', (groups) => {
-    if (!groups) groups = MENU_GROUPS.map(m => ({ id: m.id, label: m.label, ...(m.locked ? { locked: true } : {}), ...(m.children ? { children: m.children.map(c => ({ id: c.id, label: c.label })) } : {}) }));
-    localStorage.setItem(MENU_STORAGE_KEY, JSON.stringify(groups));
+    if (!groups) {
+      // Firebase has no data yet — seed from hardcoded defaults
+      groups = MENU_GROUPS.map(m => ({ id: m.id, label: m.label, ...(m.locked ? { locked: true } : {}), ...(m.children ? { children: m.children.map(c => ({ id: c.id, label: c.label })) } : {}) }));
+      fbSaveSettings('menuGroups', groups); // persist to Firebase
+    }
     MENU_GROUPS.length = 0;
     groups.forEach(g => MENU_GROUPS.push(g));
     if (currentPage === 'manage_menus') renderManageMenus();
-    if (currentPage === 'new_request') document.querySelectorAll('.user-role-select').forEach(sel => {
-      // Option to refresh the permission text when menus change
-    });
   });
 
   fbListenSettings('roles', (roles) => {
@@ -1413,15 +1388,8 @@ async function deleteTypeRow(id) {
 // ============================================================
 
 function loadMenuGroups() {
-  try {
-    const stored = localStorage.getItem(MENU_STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch { }
-  return MENU_GROUPS.map(m => ({
-    id: m.id, label: m.label,
-    ...(m.locked ? { locked: true } : {}),
-    ...(m.children ? { children: m.children.map(c => ({ id: c.id, label: c.label })) } : {}),
-  }));
+  // Always use the global MENU_GROUPS which is kept in sync by the Firebase listener
+  return MENU_GROUPS;
 }
 
 async function saveMenuGroups(groups) {
@@ -1961,7 +1929,7 @@ function exportAllCSV() {
 function exportDetailPDF(id) {
   const requests = loadRequests();
   const r = requests.find(req => req.id === id);
-  if (!r) return;
+  if (!r) { showToast('ไม่พบ Request', 'error'); return; }
 
   const reqType = REQUEST_TYPES.find(t => t.id === r.requestType);
   const st = REQUEST_STATUS[r.status] || {};
