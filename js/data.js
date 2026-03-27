@@ -2,10 +2,12 @@
 // data.js — Master data for Merchant Control Service Request
 // ============================================================
 
-// Each item: { id, label, locked?, children? }
-// items with children[] act as parent (their own id is the parent checkbox)
-// locked:true = always ticked, cannot uncheck
-const MENU_GROUPS = [
+// MENU_GROUPS is populated exclusively from Firebase (via fbListenSettings 'menuGroups')
+// This array starts empty and is filled by the realtime listener on app startup.
+const MENU_GROUPS = [];
+
+// Seed data — used ONLY if Firebase has no 'menuGroups' document yet (first-time setup)
+const _DEFAULT_MENU_GROUPS = [
   { id: 'M01', label: 'แดชบอร์ด', locked: true },
   { id: 'M02', label: 'ยอดรวมรายได้' },
   { id: 'M03', label: 'ประวัติการโอนเงินคืน' },

@@ -1235,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fbListenSettings('menuGroups', (groups) => {
     if (!groups) {
       // Firebase has no data yet — seed from hardcoded defaults
-      groups = MENU_GROUPS.map(m => ({ id: m.id, label: m.label, ...(m.locked ? { locked: true } : {}), ...(m.children ? { children: m.children.map(c => ({ id: c.id, label: c.label })) } : {}) }));
+      groups = _DEFAULT_MENU_GROUPS.map(m => ({ id: m.id, label: m.label, ...(m.locked ? { locked: true } : {}), ...(m.children ? { children: m.children.map(c => ({ id: c.id, label: c.label })) } : {}) }));
       fbSaveSettings('menuGroups', groups); // persist to Firebase
     }
     MENU_GROUPS.length = 0;
