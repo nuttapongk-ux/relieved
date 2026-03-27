@@ -1,0 +1,159 @@
+// ============================================================
+// data.js — Master data for Merchant Control Service Request
+// ============================================================
+
+// Each item: { id, label, locked?, children? }
+// items with children[] act as parent (their own id is the parent checkbox)
+// locked:true = always ticked, cannot uncheck
+const MENU_GROUPS = [
+  { id: 'M01', label: 'แดชบอร์ด', locked: true },
+  { id: 'M02', label: 'ยอดรวมรายได้' },
+  { id: 'M03', label: 'ประวัติการโอนเงินคืน' },
+  {
+    id: 'M04', label: 'รายการสั่งซื้อและผู้ซื้อ',
+    children: [
+      { id: 'M05', label: 'รายการสั่งซื้อทั้งหมด' },
+      { id: 'M06', label: 'คืนเงินหรือยกเลิกรายการ' },
+      { id: 'M07', label: 'อัตราแลกเปลี่ยน' },
+    ],
+  },
+  {
+    id: 'M08', label: 'จัดการข้อมูลร้านค้า',
+    children: [
+      { id: 'M09', label: 'ตั้งค่าเบื้องต้น' },
+      { id: 'M10', label: 'ข้อมูลส่วนตัว' },
+      { id: 'M11', label: 'แก้ไขข้อมูลส่วนตัว' },
+      { id: 'M12', label: 'แก้ไขข้อมูลบัญชีธนาคาร' },
+      { id: 'M13', label: 'เปลี่ยนรหัสผ่าน' },
+      { id: 'M14', label: 'ข้อมูลใบกำกับภาษี' },
+      { id: 'M15', label: 'ส่งคำกลับเว็บไซต์หลัก' },
+    ],
+  },
+  { id: 'M16', label: 'จัดการเอกสาร' },
+  {
+    id: 'M17', label: 'ลิงก์ชำระเงิน (Pay.sn)',
+    children: [
+      { id: 'M18', label: 'ลิงก์รับชำระเงินของร้านค้า' },
+      { id: 'M19', label: 'ลิงก์รับชำระเงินแบบกำหนดเวลา' },
+    ],
+  },
+  { id: 'M20', label: 'เทคนิคการใช้งาน' },
+  {
+    id: 'M21', label: 'บริการชำระเงินอัตโนมัติ',
+    children: [
+      { id: 'M22', label: 'สร้างรายการชำระเงินอัตโนมัติ' },
+      { id: 'M23', label: 'การชำระเงินอัตโนมัติ' },
+    ],
+  },
+  { id: 'M24', label: 'เพิ่มโลโก้ชำระเงินบนเว็บไซต์' },
+  { id: 'M25', label: 'ข่าวสารและกิจกรรมใหม่' },
+  { id: 'M26', label: 'ดาวน์โหลดใบเสร็จ / ใบกำกับภาษี อิเล็กทรอนิกส์' },
+  { id: 'M27', label: 'ตัวแทนจำหน่าย' },
+];
+
+// Helper: flatten all menu IDs from MENU_GROUPS
+function getAllMenuIds() {
+  return MENU_GROUPS.flatMap(m => m.children ? [m.id, ...m.children.map(c => c.id)] : [m.id]);
+}
+
+// Helper: find a menu item by id (searches parents and children)
+function findMenuById(id) {
+  for (const m of MENU_GROUPS) {
+    if (m.id === id) return m;
+    if (m.children) { const c = m.children.find(c => c.id === id); if (c) return c; }
+  }
+  return null;
+}
+
+
+
+const MERCHANTS = [
+  { id: 'MCH001', name: 'ร้านค้า A – บางรัก' },
+  { id: 'MCH002', name: 'ร้านค้า B – สาทร' },
+  { id: 'MCH003', name: 'ร้านค้า C – ลาดกระบัง' },
+  { id: 'MCH004', name: 'ร้านค้า D – นนทบุรี' },
+  { id: 'MCH005', name: 'ร้านค้า E – เชียงใหม่' },
+  { id: 'MCH006', name: 'ร้านค้า F – ขอนแก่น' },
+  { id: 'MCH007', name: 'ร้านค้า G – ภูเก็ต' },
+];
+
+const ROLES = [
+  {
+    id: 'ROLE_ADMIN',
+    name: 'Administrator',
+    description: 'สิทธิ์ระดับสูงสุด – จัดการผู้ใช้, ตั้งค่าร้านค้า, ดูรายงานทุกประเภท',
+    level: 'high',
+  },
+  {
+    id: 'ROLE_MGR',
+    name: 'Manager',
+    description: 'จัดการออเดอร์, อนุมัติธุรกรรม, ดูรายงานสรุป',
+    level: 'medium',
+  },
+  {
+    id: 'ROLE_CASHIER',
+    name: 'Cashier',
+    description: 'รับชำระเงิน, สร้างออเดอร์, พิมพ์ใบเสร็จ',
+    level: 'low',
+  },
+  {
+    id: 'ROLE_REPORT',
+    name: 'Report Viewer',
+    description: 'ดูรายงานยอดขาย, Export ข้อมูล (Read-Only)',
+    level: 'low',
+  },
+  {
+    id: 'ROLE_AUDITOR',
+    name: 'Auditor',
+    description: 'ตรวจสอบ Log การทำธุรกรรม, ดูรายงานทางการเงิน',
+    level: 'medium',
+  },
+];
+
+const REQUEST_TYPES = [
+  { id: 'CREATE_USER', label: 'สร้าง User ใหม่' },
+  { id: 'ASSIGN_ROLE', label: 'กำหนด Role ให้ User' },
+  { id: 'MODIFY_ROLE', label: 'แก้ไข Role ที่มีอยู่' },
+  { id: 'REVOKE_ACCESS', label: 'ยกเลิกสิทธิ์การเข้าถึง' },
+  { id: 'RESET_PASSWORD', label: 'Reset Password' },
+];
+
+const REQUEST_STATUS = {
+  PENDING: { label: 'รอดำเนินการ', color: '#f59e0b', icon: '⏳' },
+  IN_PROGRESS: { label: 'กำลังดำเนินการ', color: '#3b82f6', icon: '🔄' },
+  COMPLETED: { label: 'ดำเนินการเรียบร้อยแล้ว', color: '#10b981', icon: '✅' },
+  REJECTED: { label: 'ปฏิเสธ', color: '#ef4444', icon: '❌' },
+};
+
+// Storage helpers
+const STORAGE_KEY = 'merchant_rs_requests';
+
+function loadRequests() {
+  if (window._latestRequests) return window._latestRequests;
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRequests(requests) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+}
+
+function generateId() {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `SR-${yy}${mm}${dd}-${rand}`;
+}
+
+function formatDateTime(isoString) {
+  const d = new Date(isoString);
+  return d.toLocaleDateString('th-TH', {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
