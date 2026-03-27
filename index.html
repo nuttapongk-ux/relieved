@@ -1,2085 +1,645 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merchant Control - Batch User Creation</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <!-- Google Fonts: Kanit -->
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS with Custom Configuration -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        // Custom Brand Color #004BFF generated palette
-                        brand: {
-                            50: '#eef4ff',
-                            100: '#dce8ff',
-                            200: '#b0ccff',
-                            300: '#7aa8ff',
-                            400: '#3d7aff',
-                            500: '#004BFF', // Main Brand Color
-                            600: '#003ce6',
-                            700: '#002fb3',
-                            800: '#00268f',
-                            900: '#002075',
-                        },
-                        'popup-btn': '#1F2937', 
-                        'popup-icon-bg': '#FEE2E2',
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c7c7c7; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8; 
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Checkbox Custom Style */
-        .custom-checkbox:checked + div {
-            background-color: #eff6ff;
-            border-color: #003ce6;
-            color: #002fb3;
-        }
-        .custom-checkbox:checked + div .check-icon {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* Modal Animation */
-        .modal-enter {
-            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalPop {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Merchant Control – Service Request</title>
+    <meta name="description" content="ระบบส่งคำขอสร้าง User และกำหนด Role สำหรับ Merchant Control" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>" />
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
 
-    <!-- Navbar -->
-    <div class="fixed top-4 right-4 z-50 flex gap-2">
-        <button onclick="window.toggleView('user')" id="btnUserView" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:bg-brand-700 transition-colors hidden">
-            <i class="fa-solid fa-pen-to-square mr-2"></i> หน้าฟอร์มคำร้อง
-        </button>
-        <button onclick="window.toggleView('admin')" id="btnAdminView" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:bg-slate-700 transition-colors">
-            <i class="fa-solid fa-user-shield mr-2"></i> ระบบจัดการหลังบ้าน (Admin)
-        </button>
-    </div>
+<body>
 
-    <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-8 relative">
-            <button onclick="window.closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-slate-100"><i class="fa-solid fa-user-shield text-white text-3xl"></i></div>
-                <h3 class="text-2xl font-bold text-slate-800">Admin Access</h3>
-                <p class="text-sm text-slate-500 mt-1">เข้าสู่ระบบเพื่อจัดการข้อมูล</p>
+    <div class="app-layout">
+
+        <!-- ═══════════════════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-mark">
+                    <div class="logo-icon">🏪</div>
+                    <div class="logo-text">
+                        <span class="logo-title">Merchant Control</span>
+                        <span class="logo-sub">SERVICE REQUEST</span>
+                    </div>
+                </div>
             </div>
-            <form onsubmit="window.handleAdminLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Username</label>
-                    <input type="text" id="loginUsername" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none text-sm transition-all" placeholder="Enter username">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
-                    <input type="password" id="loginPassword" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none text-sm transition-all" placeholder="Enter password">
-                </div>
-                <div id="loginError" class="text-red-500 text-xs text-center hidden bg-red-50 py-2 rounded border border-red-100"><i class="fa-solid fa-circle-exclamation mr-1"></i> ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg shadow-lg shadow-slate-200 transition-all active:scale-[0.98] mt-2">เข้าสู่ระบบ</button>
-                <div class="text-center mt-4 text-[10px] text-slate-400"></div>
-            </form>
-        </div>
-    </div>
 
-    <!-- Admin User Management Modal -->
-    <div id="adminUsersModal" class="hidden fixed inset-0 z-[85] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-users-gear text-xl"></i></div>
-                    <h3 class="font-bold text-lg">จัดการผู้ใช้ระบบ (Back Office Users)</h3>
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">หน้าหลัก</div>
+                <a class="nav-item" data-page="dashboard" onclick="navigateTo('dashboard')" href="#">
+                    <span class="nav-icon">📊</span> ภาพรวมระบบ
+                </a>
+
+                <div class="nav-section-label">คำขอ</div>
+                <a class="nav-item" data-page="new_request" onclick="navigateTo('new_request')" href="#">
+                    <span class="nav-icon">➕</span> ส่งคำขอใหม่
+                </a>
+
+                <div id="management-nav-section" style="display:none">
+                    <div class="nav-section-label">ระบบการจัดการ</div>
+                    <a class="nav-item" data-page="requests" onclick="navigateTo('requests')" href="#">
+                        <span class="nav-icon">📋</span> รายการคำขอของฉัน
+                    </a>
+                    <a class="nav-item" data-page="admin" onclick="navigateTo('admin')" href="#">
+                        <span class="nav-icon">🛡️</span> Admin Panel
+                        <span class="nav-badge" id="pending-badge">0</span>
+                    </a>
+                    <a class="nav-item" data-page="manage_types" onclick="navigateTo('manage_types')" href="#">
+                        <span class="nav-icon">🗂️</span> ประเภทคำขอ
+                    </a>
+                    <a class="nav-item" data-page="manage_menus" onclick="navigateTo('manage_menus')" href="#">
+                        <span class="nav-icon">🔧</span> เมนูสิทธิ์
+                    </a>
+                    <a class="nav-item" data-page="manage_roles" onclick="navigateTo('manage_roles')" href="#">
+                        <span class="nav-icon">🎭</span> Role Default
+                    </a>
                 </div>
-                <button onclick="window.closeAdminUsersModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card" id="sidebar-user-card">
+                    <div class="user-avatar" id="sidebar-avatar">👤</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-user-name">ยังไม่ได้เข้าสู่ระบบ</div>
+                        <div class="user-role" id="sidebar-user-role">
+                            <a href="#" onclick="openLoginModal();return false"
+                                style="color:var(--primary-light);text-decoration:none;font-size:12px">🔑
+                                เข้าสู่ระบบ</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex-1 p-6 overflow-y-auto bg-white flex flex-col">
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานใหม่</h4>
-                    <form id="addAdminUserForm" onsubmit="window.saveAdminUser(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input type="hidden" id="adminUserId">
-                        <div><label class="block text-[10px] text-slate-500 mb-1">Username</label><input type="text" id="adminUsername" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-brand-500 outline-none" placeholder="เช่น admin"></div>
-                        <div><label class="block text-[10px] text-slate-500 mb-1">Password</label><input type="text" id="adminPassword" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-brand-500 outline-none" placeholder="รหัสผ่าน"></div>
-                        <div><label class="block text-[10px] text-slate-500 mb-1">Display Name</label><input type="text" id="adminDisplayName" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-brand-500 outline-none" placeholder="เช่น Super Admin"></div>
-                        <div><label class="block text-[10px] text-slate-500 mb-1">Role</label><select id="adminRole" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-brand-500 outline-none bg-white"><option value="admin">Admin (Full Access)</option><option value="sale">Sale (Read Only)</option></select></div>
-                        <div class="md:col-span-2 flex justify-end gap-2 mt-2">
-                            <button type="button" onclick="window.resetAdminUserForm()" class="px-3 py-2 text-xs text-slate-500 hover:text-slate-700">ล้างค่า</button>
-                            <button id="btnSaveAdminUser" type="submit" class="bg-brand-600 text-white px-4 py-2 rounded text-xs hover:bg-brand-700 shadow-sm flex items-center gap-2"><i class="fa-solid fa-save"></i> บันทึกข้อมูล</button>
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════ -->
+        <div class="main-content">
+
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="topbar-title" id="topbar-title">📊 ภาพรวมระบบ</div>
+                <div class="topbar-actions">
+                    <div class="btn-icon" title="รีเฟรช"
+                        onclick="renderDashboard();renderRequestList();renderAdminPanel();">🔄</div>
+                    <div class="btn-icon" title="ส่งคำขอใหม่" onclick="navigateTo('new_request')">➕</div>
+                </div>
+            </header>
+
+            <!-- ─────────────── PAGE: DASHBOARD ─────────────── -->
+            <section class="page" id="page-dashboard">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">ภาพรวมระบบ Service Request</div>
+                        <div class="section-sub">สรุปสถานะคำขอทั้งหมดในระบบ Merchant Control</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="navigateTo('new_request')">
+                        ➕ ส่งคำขอใหม่
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon purple">📋</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">คำขอทั้งหมด</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-pending">0</div>
+                            <div class="stat-label">รอดำเนินการ</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-completed">0</div>
+                            <div class="stat-label">ดำเนินการเรียบร้อยแล้ว</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Requests -->
+                <div class="card">
+                    <div class="flex-between mb-4">
+                        <div style="font-size:16px;font-weight:700">คำขอล่าสุด</div>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('requests')">ดูทั้งหมด →</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>ประเภทคำขอ</th>
+                                    <th>ร้านค้า</th>
+                                    <th>สถานะ</th>
+                                    <th>วันที่ส่ง</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tbody">
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding:40px;color:var(--text-muted)">
+                                        กำลังโหลด...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─────────────── PAGE: NEW REQUEST (Multi-Step) ─────────────── -->
+            <section class="page" id="page-new_request">
+
+                <!-- Success State -->
+                <div id="submit-success" class="hidden"
+                    style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+                    <div style="font-size:72px;margin-bottom:20px">🎉</div>
+                    <h2 style="font-size:26px;font-weight:800;margin-bottom:8px">ส่งคำขอสำเร็จ!</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:8px">คำขอของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+                    <div style="font-family:monospace;font-size:22px;color:var(--primary-light);font-weight:700;background:var(--bg-card);padding:12px 28px;border-radius:12px;border:1px solid var(--border);margin:12px 0"
+                        id="success-req-id"></div>
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:28px">
+                        ทีมงานจะดำเนินการและแจ้งผลให้ทราบ</p>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:20px">
+                        <button class="btn btn-primary" onclick="resetForm();clearCountdown()">➕ ส่งคำขอใหม่</button>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:13px">กลับหน้าภาพรวมอัตโนมัติใน <span
+                            id="countdown-seconds" style="font-weight:700;color:var(--primary-light)">10</span> วินาที
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <div id="page-new_request-inner">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">ส่งคำขอใหม่</div>
+                            <div class="section-sub">กรอกข้อมูลเพื่อส่งคำขอสร้าง User / กำหนด Role บน Merchant Control
+                            </div>
+                        </div>
+                        <div>
+                            <input type="file" id="import-excel-input" accept=".xlsx,.xls,.csv" style="display:none"
+                                onchange="importExcelFile(this)" />
+                            <button class="btn btn-outline"
+                                onclick="document.getElementById('import-excel-input').click()">
+                                📂 Import Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step Bar -->
+                    <div class="step-bar">
+                        <div class="step-item active" id="step-item-1">
+                            <div class="step-wrapper" id="step-wrap-1">
+                                <div class="step-circle">1</div>
+                                <div class="step-label">ข้อมูลคำขอ</div>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-item" id="step-item-2">
+                            <div class="step-wrapper" id="step-wrap-2">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">ยืนยัน</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="req-form" onsubmit="return false;">
+
+                        <!-- STEP 1: Request Info -->
+                        <div id="form-step-1">
+                            <div class="card mb-6">
+                                <div
+                                    style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--primary-light)">
+                                    📋 ข้อมูลคำขอ</div>
+                                <div class="form-grid">
+                                    <!-- Request Type -->
+                                    <div class="form-group">
+                                        <label class="form-label">ประเภทคำขอ <span class="required">*</span></label>
+                                        <select class="form-control" id="req-type"
+                                            onchange="onReqTypeChange(this.value)">
+                                            <option value="">— เลือกประเภทคำขอ —</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Merchant ID -->
+                                    <div class="form-group">
+                                        <label class="form-label">Merchant ID <span class="required">*</span></label>
+                                        <input class="form-control" type="text" id="req-merchant"
+                                            placeholder="เช่น MCH001" autocomplete="off" />
+                                    </div>
+
+                                    <!-- Merchant Name -->
+                                    <div class="form-group">
+                                        <label class="form-label">Merchant Name <span class="required">*</span></label>
+                                        <input class="form-control" type="text" id="req-merchant-name"
+                                            placeholder="เช่น ร้านค้า ABC สาขาสีลม" />
+                                    </div>
+
+                                    <!-- Multi-User / Revoke-User List -->
+                                    <div class="form-group form-full">
+                                        <div class="flex-between mb-4">
+                                            <label class="form-label" style="font-size:14px" id="users-section-label">
+                                                👤 รายชื่อ User ที่ต้องการ <span class="required">*</span>
+                                            </label>
+                                            <button type="button" class="btn btn-outline btn-sm" id="btn-add-user"
+                                                onclick="addUserRow()">
+                                                ➕ เพิ่ม User
+                                            </button>
+                                        </div>
+                                        <div id="users-container"><!-- rows inserted by JS --></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: Preview & Confirm -->
+                        <div id="form-step-2" class="hidden">
+                            <div class="card mb-6">
+                                <div
+                                    style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--primary-light)">
+                                    ✅ ตรวจสอบข้อมูล</div>
+                                <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+                                    กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนกดส่งคำขอ</div>
+
+                                <div class="form-grid">
+                                    <div>
+                                        <div class="form-label">ประเภทคำขอ</div>
+                                        <div style="font-weight:600" id="prev-type">—</div>
+                                    </div>
+                                    <div>
+                                        <div class="form-label">Merchant ID</div>
+                                        <div style="font-weight:600" id="prev-merchant">—</div>
+                                    </div>
+                                    <div>
+                                        <div class="form-label">Merchant Name</div>
+                                        <div style="font-weight:600" id="prev-merchant-name">—</div>
+                                    </div>
+
+                                    <div class="form-full">
+                                        <div class="form-label" id="prev-users-label">รายชื่อ User ที่ขอ</div>
+                                        <div id="prev-users">—</div>
+                                    </div>
+                                </div>
+
+                                <div class="divider"></div>
+                                <div
+                                    style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text-secondary);">
+                                    ⚠️ เมื่อกดส่งคำขอแล้ว ระบบจะแจ้งเตือนไปยังทีม Admin เพื่อดำเนินการต่อไป
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Navigation Buttons -->
+                        <div class="flex gap-2" style="justify-content:flex-end;margin-top:8px">
+                            <button type="button" class="btn btn-outline hidden" id="btn-prev" onclick="prevStep()">←
+                                ย้อนกลับ</button>
+                            <button type="button" class="btn btn-primary" id="btn-next" onclick="nextStep()">ถัดไป
+                                →</button>
+                            <button type="button" class="btn btn-success hidden" id="btn-submit"
+                                onclick="submitRequest()">🚀 ส่งคำขอ</button>
                         </div>
                     </form>
                 </div>
-                <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-100 text-slate-600 font-medium text-xs uppercase sticky top-0"><tr><th class="px-4 py-3">User</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">Role</th><th class="px-4 py-3 text-right">Action</th></tr></thead>
-                        <tbody id="adminUsersTable" class="divide-y divide-slate-100"></tbody>
+            </section>
+
+            <!-- ─────────────── PAGE: MY REQUESTS ─────────────── -->
+            <section class="page" id="page-requests">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">รายการคำขอ</div>
+                        <div class="section-sub">ติดตามสถานะคำขอทั้งหมด</div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn btn-outline" onclick="exportAllMatrixExcel()"
+                            title="Export โครงสร้าง Matrix เรียงตามคำขอ">📊
+                            Export Excel (Matrix)</button>
+                        <button class="btn btn-primary" onclick="navigateTo('new_request')">➕ ส่งคำขอใหม่</button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input class="form-control" type="search" id="req-search"
+                        placeholder="🔍 ค้นหา Request ID, ชื่อ..." />
+                    <select class="form-control" id="filter-status">
+                        <option value="">— ทุกสถานะ —</option>
+                        <option value="PENDING">⏳ รอดำเนินการ</option>
+                        <option value="COMPLETED">✅ ดำเนินการเรียบร้อยแล้ว</option>
+                    </select>
+                    <select class="form-control" id="filter-type">
+                        <option value="">— ทุกประเภท —</option>
+                    </select>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>ประเภท</th>
+                                <th>ร้านค้า</th>
+                                <th>จำนวน User</th>
+                                <th>สถานะ</th>
+                                <th>รายละเอียด</th>
+                            </tr>
+                        </thead>
+                        <tbody id="req-list-tbody">
+                            <tr>
+                                <td colspan="7" class="text-center" style="padding:40px;color:var(--text-muted)">
+                                    กำลังโหลด...</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3"><button onclick="window.closeAdminUsersModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ปิดหน้าต่าง</button></div>
-        </div>
-    </div>
+            </section>
 
-    <!-- Role Settings Modal -->
-    <div id="roleSettingsModal" class="hidden fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-user-tag text-xl"></i></div><h3>จัดการบทบาท (Role Management)</h3></div>
-                <button onclick="window.closeRoleSettingsModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            </div>
-            <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                <div class="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4 shrink-0 flex flex-col">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">เลือกบทบาท (Select Role)</h4>
-                    <div id="settingsRoleList" class="space-y-2 flex-1 overflow-y-auto pr-1"></div>
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <div class="flex gap-2 mb-2"><input type="text" id="newRoleNameInput" placeholder="ระบุชื่อ Role..." class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:border-brand-500 outline-none"><button onclick="window.addNewRole()" class="bg-brand-600 text-white px-3 py-2 rounded-lg text-xs hover:bg-brand-700"><i class="fa-solid fa-plus"></i></button></div>
-                        <button onclick="window.restoreDefaultRoles()" class="w-full py-2 bg-slate-200 text-slate-600 rounded-lg text-xs hover:bg-slate-300 transition-colors"><i class="fa-solid fa-rotate-left mr-1"></i> คืนค่าเริ่มต้น</button>
+            <!-- ─────────────── PAGE: ADMIN PANEL ─────────────── -->
+            <section class="page" id="page-admin">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">Admin Panel – อนุมัติคำขอ</div>
+                        <div class="section-sub">ตรวจสอบและดำเนินการกับคำขอที่รอการอนุมัติ</div>
                     </div>
                 </div>
-                <div class="flex-1 p-6 overflow-y-auto bg-white">
-                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                        <h4 class="text-sm font-bold text-slate-800" id="currentRoleTitle">Editing: Manager</h4>
-                        <div class="flex gap-2">
-                            <button onclick="window.toggleSettingsAll(true)" class="text-xs text-brand-600 bg-brand-50 px-2 py-1 rounded hover:bg-brand-100">เลือกทั้งหมด</button>
-                            <button onclick="window.toggleSettingsAll(false)" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded hover:bg-slate-200">ล้าง</button>
+                <div id="admin-pending-list">
+                    <!-- Generated by JS -->
+                </div>
+
+                <!-- All Done state shown by JS if empty -->
+            </section>
+
+            <!-- ─────────────── PAGE: MANAGE REQUEST TYPES ─────────────── -->
+            <section class="page" id="page-manage_types">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">🗂️ จัดการประเภทคำขอ</div>
+                        <div class="section-sub">เพิ่ม / แก้ไข / ลบประเภทคำขอที่แสดงในฟอร์มส่งคำขอ</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddTypeForm()">➕ เพิ่มประเภทใหม่</button>
+                </div>
+
+                <!-- Add / Edit form (hidden by default) -->
+                <div class="card mb-6" id="type-form-card" style="display:none">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="type-form-title">➕
+                        เพิ่มประเภทคำขอ</div>
+                    <div class="form-grid" style="max-width:600px">
+                        <div class="form-group">
+                            <label class="form-label">รหัส (ID) <span class="required">*</span></label>
+                            <input class="form-control" id="type-edit-id" placeholder="เช่น CREATE_USER" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ชื่อแสดงผล <span class="required">*</span></label>
+                            <input class="form-control" id="type-edit-label" placeholder="เช่น สร้าง User ใหม่" />
                         </div>
                     </div>
-                    <div class="mb-5 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-600 mb-2">คำอธิบายบทบาท (Description)</label>
-                        <textarea id="roleDescriptionInput" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-md focus:border-brand-500 outline-none resize-none text-slate-600"></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs" id="roleSettingsGrid"></div>
-                </div>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3">
-                <button onclick="window.closeRoleSettingsModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ปิดหน้าต่าง</button>
-                <button id="btnSaveRoleSettings" onclick="window.saveRoleSettings()" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm flex items-center gap-2"><i class="fa-solid fa-save"></i> บันทึกค่าเริ่มต้น</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Menu Settings Modal -->
-    <div id="menuSettingsModal" class="hidden fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-list-check text-xl"></i></div><h3>จัดการรายการเมนูและลำดับ</h3></div>
-                <button onclick="window.closeMenuSettingsModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            </div>
-            <div class="flex-1 p-6 overflow-y-auto bg-white flex flex-col">
-                <div class="flex gap-2 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200 items-end flex-wrap">
-                    <div class="w-16"><label class="text-[10px] text-slate-500 block mb-1">ID</label><input type="number" id="newMenuId" placeholder="Auto" class="w-full px-2 py-2 text-xs border border-slate-300 rounded outline-none focus:border-brand-500"></div>
-                    <div class="w-16"><label class="text-[10px] text-slate-500 block mb-1">ลำดับ</label><input type="number" id="newMenuOrder" placeholder="0" value="0" class="w-full px-2 py-2 text-xs border border-slate-300 rounded outline-none focus:border-brand-500"></div>
-                    <div class="flex-1 min-w-[150px]"><label class="text-[10px] text-slate-500 block mb-1">ชื่อเมนู</label><input type="text" id="newMenuName" placeholder="ระบุชื่อเมนู..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded outline-none focus:border-brand-500"></div>
-                    <div class="w-40"><label class="text-[10px] text-slate-500 block mb-1">หมวดหมู่</label><select id="newMenuParent" onchange="window.toggleMandatoryCheck()" class="w-full px-2 py-2 text-xs border border-slate-300 rounded outline-none focus:border-brand-500 bg-white"></select></div>
-                    <div class="flex items-center justify-center pb-2 px-2" id="newMenuMandatoryContainer"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="newMenuMandatory" class="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500"><span class="text-xs text-slate-600 select-none">Required</span></label></div>
-                    <button onclick="window.addNewMenu()" class="bg-emerald-600 text-white px-4 py-2 rounded text-xs hover:bg-emerald-700 flex items-center gap-2 h-[34px]"><i class="fa-solid fa-plus"></i> เพิ่ม</button>
-                </div>
-                <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg"><table class="w-full text-sm text-left"><thead class="bg-slate-100 text-slate-600 font-medium text-xs uppercase sticky top-0 z-10"><tr><th class="px-4 py-3 w-16 text-center">ID</th><th class="px-4 py-3 w-16 text-center">ลำดับ</th><th class="px-4 py-3">ชื่อเมนู</th><th class="px-4 py-3 w-32">หมวดหมู่</th><th class="px-4 py-3 w-16 text-center">Req.</th><th class="px-4 py-3 text-right w-24">จัดการ</th></tr></thead><tbody id="menuManagerTable" class="divide-y divide-slate-100"></tbody></table></div>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3"><button onclick="window.closeMenuSettingsModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ปิดหน้าต่าง</button></div>
-        </div>
-    </div>
-
-    <!-- Duplicate Warning Modal -->
-    <div id="duplicateWarningModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
-            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-xmark text-red-500 text-4xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">พบข้อมูลซ้ำ</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="duplicateWarningMessage">Username หรือ Email นี้มีอยู่ในรายการแล้ว<br>กรุณาตรวจสอบ</p>
-            <button onclick="window.closeDuplicateWarningModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ปิดหน้าจอ</button>
-        </div>
-    </div>
-
-    <!-- Validation Warning Modal -->
-    <div id="validationModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[340px] overflow-hidden p-8 text-center transform transition-all scale-100 relative">
-            <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-6 auto mb-6 shadow-sm"><i class="fa-solid fa-circle-exclamation text-orange-500 text-4xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ข้อความแจ้งเตือน</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="validationMessage">กรุณากรอกข้อมูลให้ครบถ้วน</p>
-            <button onclick="window.closeValidationModal()" class="w-full py-3.5 bg-popup-btn hover:bg-slate-800 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ตกลง</button>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteConfirmModal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center transform transition-all scale-100">
-            <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm"><i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i></div>
-            <h3 class="text-lg font-bold text-slate-800 mb-2">ยืนยันการลบ?</h3>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed">คุณต้องการลบ "<span id="deleteItemNameDisplay" class="font-bold text-slate-700"></span>" ใช่หรือไม่?</p>
-            <div class="flex gap-3 justify-center">
-                <button onclick="window.closeDeleteConfirmModal()" class="px-5 py-2.5 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium transition-colors">ยกเลิก</button>
-                <button id="btnConfirmDelete" onclick="window.executeDelete()" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium shadow-md shadow-red-100 transition-colors flex items-center gap-2"><i class="fa-solid fa-trash-can"></i> ยืนยันลบ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detail Modal -->
-    <div id="detailModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/10 p-2 rounded-lg"><i class="fa-solid fa-file-invoice text-xl"></i></div><div><h3 class="font-bold text-lg" id="modalMerchantName">Merchant Name</h3><p class="text-xs text-slate-400" id="modalBatchId">Batch ID: -</p></div></div>
-                <button onclick="window.closeDetailModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            </div>
-            <div class="p-0 overflow-y-auto flex-1 bg-slate-50">
-                <table class="w-full text-left border-collapse"><thead class="bg-white text-slate-500 text-xs uppercase border-b border-slate-200 sticky top-0 shadow-sm z-10"><tr><th class="px-6 py-3 font-semibold">User Info</th><th class="px-6 py-3 font-semibold">Role</th><th class="px-6 py-3 font-semibold">Permissions</th><th class="px-6 py-3 font-semibold text-center">Status</th><th class="px-6 py-3 font-semibold text-right">Action</th></tr></thead><tbody id="modalTableBody" class="divide-y divide-slate-100 bg-white"></tbody></table>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-between items-center">
-                <button onclick="window.exportBatchExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm transition-colors"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
-                <button onclick="window.closeDetailModal()" class="px-6 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 font-medium text-sm">ปิดหน้าต่าง</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div id="editUserModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-brand-600 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-user-pen mr-2"></i>แก้ไขข้อมูลผู้ใช้งาน</h3>
-                <button onclick="window.closeEditModal()" class="text-brand-200 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 bg-slate-50">
-                <form id="editUserForm" class="space-y-4">
-                    <input type="hidden" id="editUserId">
-                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"><h4 class="text-xs font-bold text-slate-400 uppercase mb-3">ข้อมูลส่วนตัว</h4><div class="grid grid-cols-2 gap-4"><div class="col-span-2"><label class="block text-xs font-medium text-slate-700 mb-1">Username</label><input type="text" id="editName" class="w-full px-3 py-2 rounded border border-slate-300 text-sm focus:border-brand-500 outline-none"></div><div class="col-span-2"><label class="block text-xs font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="editEmail" class="w-full px-3 py-2 rounded border border-slate-300 text-sm focus:border-brand-500 outline-none"></div></div></div>
-                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"><h4 class="text-xs font-bold text-slate-400 uppercase mb-3">สิทธิ์การใช้งาน</h4><div class="mb-4"><label class="block text-xs font-medium text-slate-700 mb-2">บทบาท (Role)</label><div id="editRoleGrid" class="grid grid-cols-4 gap-2"></div></div><div class="border-t border-slate-100 pt-3"><div class="flex justify-between items-center mb-2"><label class="text-xs font-medium text-slate-700">เลือกเมนูรายตัว</label><div class="flex gap-2"><button type="button" onclick="window.toggleEditAll(true)" class="text-[10px] text-brand-600 bg-brand-50 px-2 py-1 rounded">เลือกทั้งหมด</button><button type="button" onclick="window.toggleEditAll(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded">ล้าง</button></div></div><div class="grid grid-cols-2 gap-2 text-xs" id="editPermissionGrid"></div></div></div>
-                </form>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3"><button onclick="window.closeEditModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">ยกเลิก</button><button onclick="window.saveUserChanges()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm">บันทึกการแก้ไข</button></div>
-        </div>
-    </div>
-
-    <!-- Preview Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-brand-600 text-white p-4 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-magnifying-glass-chart text-xl"></i></div><h3 class="font-bold text-lg">ตรวจสอบข้อมูลก่อนส่ง (Preview Request)</h3></div>
-                <button onclick="window.closePreviewModal()" class="text-brand-200 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 bg-slate-50 custom-scrollbar">
-                <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6 shadow-sm">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">ข้อมูลร้านค้า (Merchant Info)</h4>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div><span class="text-slate-500 block text-xs">Merchant ID</span> <span id="previewMerchantId" class="font-medium text-slate-800 text-lg">-</span></div>
-                        <div><span class="text-slate-500 block text-xs">Merchant Name</span> <span id="previewMerchantName" class="font-medium text-slate-800 text-lg">-</span></div>
+                    <div style="display:flex;gap:10px;margin-top:16px">
+                        <button class="btn btn-primary" onclick="saveTypeForm()">💾 บันทึก</button>
+                        <button class="btn btn-outline" onclick="hideTypeForm()">ยกเลิก</button>
                     </div>
                 </div>
-                <div class="flex justify-between items-end mb-3"><h4 class="text-sm font-bold text-slate-700">รายการผู้ใช้งานที่จะสร้าง (<span id="previewUserCount">0</span>)</h4></div>
-                <div id="previewUserList" class="space-y-3"></div>
-            </div>
-            <div class="p-4 border-t border-slate-200 bg-white shrink-0 flex justify-end gap-3">
-                <button onclick="window.closePreviewModal()" class="px-6 py-2.5 border border-slate-300 text-slate-600 font-medium rounded-lg hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> กลับไปแก้ไข</button>
-                <button onclick="window.confirmSubmission()" id="btnRealSubmit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg shadow-lg shadow-brand-200 transition-all active:scale-[0.98] flex items-center gap-2"><span>ยืนยันการส่งข้อมูล</span> <i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Success Message Modal (High Z-Index) -->
-    <div id="successMessage" class="hidden fixed inset-0 z-[200] flex-col items-center justify-center animate-fade-in bg-slate-900/40 backdrop-blur-[2px]">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center mx-4 border border-slate-100 transform scale-100">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5 mx-auto ring-4 ring-green-50"><i class="fa-solid fa-check text-3xl text-green-600"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-3">ได้รับข้อมูลเรียบร้อยแล้ว</h3>
-            <p class="text-slate-600 mb-6 text-sm leading-relaxed">ทาง <span class="font-semibold text-brand-600">Paysolutions</span> ได้รับข้อมูลของท่านแล้ว<br>โดยจะดำเนินการให้ภายใน 24 ชั่วโมง</p>
-            <button onclick="window.resetAll()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">ปิดหน้าจอ</button>
-        </div>
-    </div>
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>รหัส (ID)</th>
+                                    <th>ชื่อแสดงผล</th>
+                                    <th style="text-align:right">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="type-table-body">
+                                <!-- filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-    <!-- Container Center Wrapper -->
-    <div class="flex items-center justify-center min-h-[calc(100vh-2rem)]">
-        <div id="userView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden flex flex-col md:flex-row min-h-[600px] animate-fade-in">
-            <!-- Sidebar -->
-            <div class="bg-brand-600 p-8 md:w-1/4 flex flex-col justify-between text-white relative overflow-hidden shrink-0">
-                <div class="relative z-10"><div class="flex items-center gap-3 mb-6"><div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-layer-group text-2xl"></i></div><span class="font-bold text-xl tracking-wide">Merchant Control</span></div><h2 class="text-2xl font-bold mb-4">เพิ่มผู้ใช้งาน (Batch)</h2><p class="text-brand-100 font-light text-sm leading-relaxed">สามารถเพิ่มผู้ใช้งานได้หลายคนในครั้งเดียว โดยใช้ข้อมูลร้านค้าชุดเดียวกัน</p><div class="mt-6 bg-brand-800 p-4 rounded-lg backdrop-blur-sm border border-brand-500"><div class="text-xs text-brand-200 mb-1 uppercase tracking-wider font-semibold">รายการที่เพิ่มแล้ว</div><div class="text-3xl font-bold text-white flex items-baseline gap-2"><span id="queueCountDisplay">0</span><span class="text-sm font-normal opacity-70">คน</span></div></div></div>
-            </div>
-            <!-- Form -->
-            <div class="p-8 md:w-3/4 relative flex flex-col h-[90vh] md:h-auto">
-                <form id="requestForm" class="flex-1 overflow-y-auto pr-2 pb-24 scroll-smooth">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 sticky top-0 z-20 shadow-sm">
-                         <h4 class="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-shop text-brand-500"></i> ข้อมูลร้านค้า (ใช้ร่วมกัน)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">รหัสร้านค้า (ID)</label><input type="text" name="merchantId" required placeholder="ระบุตัวเลข (สูงสุด 5 หลัก)" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" inputmode="numeric" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm"></div>
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">ชื่อร้านค้า</label><input type="text" name="merchantName" placeholder="ระบุชื่อร้านค้า" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
+            <!-- ─────────────── PAGE: MANAGE PERMISSION MENUS ─────────────── -->
+            <section class="page" id="page-manage_menus">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">🔧 จัดการเมนูสิทธิ์</div>
+                        <div class="section-sub">เพิ่ม / แก้ไข / ลบเมนูที่ใช้กำหนดสิทธิ์ให้ User</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddMenuForm(null)">➕ เพิ่มเมนูหลัก</button>
+                </div>
+
+                <!-- Add / Edit form -->
+                <div class="card mb-6" id="menu-form-card" style="display:none">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="menu-form-title">➕ เพิ่มเมนู
+                    </div>
+                    <div class="form-grid" style="max-width:700px">
+                        <div class="form-group">
+                            <label class="form-label">รหัส (ID) <span class="required">*</span></label>
+                            <input class="form-control" id="menu-edit-id" placeholder="เช่น M28" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ชื่อเมนู <span class="required">*</span></label>
+                            <input class="form-control" id="menu-edit-label" placeholder="ชื่อเมนู" />
                         </div>
                     </div>
-                    
-                    <div id="queueSection" class="hidden mb-6">
-                        <h4 class="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-brand-600"></i> รายการที่รอส่ง (Pending List)</h4>
-                        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm"><table class="w-full text-sm text-left"><thead class="bg-slate-50 text-slate-500 text-xs uppercase"><tr><th class="px-4 py-2 w-12 text-center">No.</th><th class="px-4 py-2">Username</th><th class="px-4 py-2">Role</th><th class="px-4 py-2 text-center">สิทธิ์</th><th class="px-4 py-2 text-right">ลบ</th></tr></thead><tbody id="queueListBody" class="divide-y divide-slate-100"></tbody></table></div>
-                    </div>
-
-                    <div class="border-2 border-dashed border-brand-200 bg-brand-50/30 p-5 rounded-xl mb-4 relative transition-all" id="userInputSection">
-                        <div class="flex justify-between items-center mb-4">
-                             <div class="absolute -top-3 left-4 bg-white px-2 text-xs font-bold text-brand-600 border border-brand-100 rounded-full shadow-sm"><i class="fa-solid fa-user-plus mr-1"></i> เพิ่มผู้ใช้งานคนที่ <span id="nextUserIndex">1</span></div>
-                             <div class="ml-auto">
-                                 <button type="button" onclick="window.openImportModal()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors flex items-center gap-2">
-                                     <i class="fa-solid fa-file-import"></i> Import CSV
-                                 </button>
-                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 mt-2">
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">Username</label><input type="text" id="inputName" placeholder="ระบุ Username" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
-                            <div><label class="block text-xs font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="inputEmail" placeholder="email@ex.com" class="w-full px-3 py-2 rounded border border-slate-300 focus:border-brand-500 focus:outline-none text-sm bg-white"></div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-xs font-medium text-slate-700 mb-2">บทบาท (Role)</label>
-                            <div id="mainRoleGrid" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
-                            <div id="roleDescription" class="mt-3 p-3 bg-white border border-brand-200 rounded-lg text-xs text-slate-600 shadow-sm hidden"></div>
-                        </div>
-                        <details class="group bg-white rounded-lg border border-slate-200">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-xs text-slate-600 bg-slate-50 rounded-t-lg group-open:border-b"><span><i class="fa-solid fa-list-check mr-2 text-brand-500"></i> กำหนดสิทธิ์รายเมนู (Advanced)</span><span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span></summary>
-                            <div class="text-neutral-600 p-3 group-open:animate-fadeIn">
-                                <div class="flex justify-end gap-2 mb-2"><button type="button" onclick="window.toggleAll(true)" class="text-[10px] text-brand-600 bg-brand-50 px-2 py-1 rounded">เลือกทั้งหมด</button><button type="button" onclick="window.toggleAll(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-1 rounded">ล้าง</button></div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs" id="permissionGrid"></div>
-                            </div>
-                        </details>
-                        <div class="mt-4 flex justify-end"><button type="button" onclick="window.addToQueue()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg transition-all active:scale-95"><i class="fa-solid fa-plus-circle"></i> เพิ่มลงรายการ</button></div>
-                    </div>
-                </form>
-                <div class="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-200 flex items-center justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                    <div class="text-sm text-slate-500 hidden sm:block">รอส่งทั้งหมด <span id="footerCount" class="font-bold text-slate-800">0</span> รายการ</div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <button type="button" onclick="window.resetAll()" class="px-4 py-2.5 border border-slate-300 text-slate-600 font-medium rounded-lg hover:bg-slate-50 transition-colors bg-white flex-1 sm:flex-none">ล้างทั้งหมด</button>
-                        <button type="button" onclick="window.openPreviewModal()" id="btnReviewRequest" disabled class="flex-1 sm:flex-none bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-brand-200 transition-all flex justify-center items-center gap-2"><span>ยืนยันทั้งหมด</span> <i class="fa-solid fa-paper-plane text-sm"></i></button>
+                    <input type="hidden" id="menu-edit-parent" value="" />
+                    <input type="hidden" id="menu-edit-orig-id" value="" />
+                    <div style="display:flex;gap:10px;margin-top:16px">
+                        <button class="btn btn-primary" onclick="saveMenuForm()">💾 บันทึก</button>
+                        <button class="btn btn-outline" onclick="hideMenuForm()">ยกเลิก</button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div id="adminView" class="bg-white rounded-2xl shadow-xl w-full max-w-6xl overflow-hidden hidden flex-col min-h-[600px] animate-fade-in">
-             <div class="bg-slate-800 text-white p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-4"><div class="bg-white/10 p-3 rounded-xl"><i class="fa-solid fa-users-gear text-2xl"></i></div><div><h2 class="text-2xl font-bold">Admin Management</h2><div class="flex items-center gap-2"><p class="text-slate-400 text-sm">ระบบจัดการคำร้องขอเปิดใช้งาน</p><span id="currentUserBadge" class="bg-brand-500 text-[10px] px-2 py-0.5 rounded-full text-white font-bold uppercase hidden"></span></div></div></div>
-                <div class="flex items-center gap-3">
-                    <div id="adminTools" class="flex gap-3 hidden">
-                        <button onclick="window.openRoleSettingsModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-600 flex items-center gap-2 shadow-sm"><i class="fa-solid fa-user-tag mr-1"></i> ตั้งค่าบทบาท</button>
-                        <button onclick="window.openMenuSettingsModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-600 flex items-center gap-2 shadow-sm"><i class="fa-solid fa-list mr-1"></i> จัดการเมนู</button>
-                        <button onclick="window.openAdminUsersModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-600 flex items-center gap-2 shadow-sm"><i class="fa-solid fa-users-gear mr-1"></i> ผู้ใช้ระบบ</button>
-                    </div>
-                    <button onclick="window.handleLogout()" class="bg-red-500/20 text-red-100 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 flex items-center gap-2"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                <div class="card">
+                    <div id="menu-tree-list"><!-- filled by JS --></div>
                 </div>
+            </section>
+
+            <!-- ─────────────── PAGE: MANAGE ROLE DEFAULTS ─────────────── -->
+            <section class="page" id="page-manage_roles">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">🎭 จัดการ Role Default</div>
+                        <div class="section-sub">กำหนด Role และสิทธิ์เมนู ที่จะถูก pre-select อัตโนมัติในแบบฟอร์มส่งคำขอ
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddRoleForm()">➕ เพิ่ม Role</button>
+                </div>
+
+                <!-- Add / Edit form -->
+                <div class="card mb-6" id="role-form-card" style="display:none">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="role-form-title">➕ เพิ่ม Role
+                    </div>
+                    <div class="form-grid" style="max-width:700px">
+                        <div class="form-group">
+                            <label class="form-label">รหัส Role (ID) <span class="required">*</span></label>
+                            <input class="form-control" id="role-edit-id" placeholder="เช่น ROLE_CASHIER" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ชื่อแสดงผล <span class="required">*</span></label>
+                            <input class="form-control" id="role-edit-name" placeholder="เช่น Cashier" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">คำอธิบาย</label>
+                            <input class="form-control" id="role-edit-desc" placeholder="คำอธิบายสั้น ๆ" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ระดับสิทธิ์</label>
+                            <select class="form-control" id="role-edit-level">
+                                <option value="high">🔴 High</option>
+                                <option value="medium">🟡 Medium</option>
+                                <option value="low" selected>🟢 Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px">
+                        <label class="form-label" style="margin-bottom:8px;display:block">🔧 สิทธิ์เมนู Default (จะถูก
+                            pre-check เมื่อเลือก Role นี้)</label>
+                        <div id="role-form-perm-panel"></div>
+                    </div>
+                    <input type="hidden" id="role-edit-orig-id" value="" />
+                    <div style="display:flex;gap:10px;margin-top:20px">
+                        <button class="btn btn-primary" onclick="saveRoleForm()">💾 บันทึก</button>
+                        <button class="btn btn-outline" onclick="hideRoleForm()">ยกเลิก</button>
+                    </div>
+                </div>
+
+                <!-- Roles table -->
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Role ID</th>
+                                    <th>ชื่อ</th>
+                                    <th>ระดับ</th>
+                                    <th>Permission Default</th>
+                                    <th>Default</th>
+                                    <th style="text-align:right">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="role-table-body">
+                                <!-- filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- end main-content -->
+    </div><!-- end app-layout -->
+
+    <!-- ═══════════════════════════════════════════════
+     MODAL: Detail View
+═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-detail">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">📄 รายละเอียดคำขอ</div>
+                <button class="modal-close" onclick="closeDetailModal()">✕</button>
             </div>
-            <div class="p-4 border-b border-slate-100 bg-slate-50 flex gap-3">
-                <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i><input type="text" id="adminSearchInput" onkeyup="window.searchRequests()" placeholder="ค้นหาชื่อ, Merchant ID, Batch ID..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-brand-500"></div>
-                <div class="flex gap-2"><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users รออนุมัติ: <span id="pendingCount" class="font-bold text-yellow-500">0</span></div><div class="bg-white px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-600">Users อนุมัติแล้ว: <span id="approvedCount" class="font-bold text-green-500">0</span></div></div>
-            </div>
-            <div class="flex-1 overflow-x-auto p-4">
-                <table class="w-full text-left border-collapse"><thead class="bg-slate-50 text-slate-500 text-sm border-y border-slate-200"><tr><th class="p-4 font-semibold w-32">วันที่แจ้ง</th><th class="p-4 font-semibold">ร้านค้า (Merchant ID / Name)</th><th class="p-4 font-semibold text-center">จำนวน Users</th><th class="p-4 font-semibold text-center">สถานะ</th><th class="p-4 font-semibold text-right">รายละเอียด</th></tr></thead><tbody id="requestTableBody" class="text-sm text-slate-700 divide-y divide-slate-100"></tbody></table>
-                <div id="emptyState" class="hidden flex-col items-center justify-center py-12 text-slate-400"><i class="fa-solid fa-inbox text-4xl mb-3 opacity-50"></i><p>ยังไม่มีรายการคำร้องขอ</p></div>
+            <div class="modal-body" id="modal-detail-body"><!-- filled by JS --></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDetailModal()">ปิด</button>
+                <button class="btn btn-primary" onclick="exportDetailMatrixExcel(_currentDetailId)"
+                    style="margin-left:auto">📊
+                    Export Excel</button>
             </div>
         </div>
     </div>
-    
-    <!-- Import Modal (New) -->
-    <div id="importModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-file-import mr-2"></i>นำเข้าข้อมูล (Import CSV)</h3>
-                <button onclick="window.closeImportModal()" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+
+    <!-- ═══════════════════════════════════════════════
+     MODAL: Reject Reason
+═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-reject">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">❌ ปฏิเสธคำขอ</div>
+                <button class="modal-close" onclick="closeRejectModal()">✕</button>
             </div>
-            <div class="p-6">
-                <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer" onclick="document.getElementById('importFile').click()" ondragover="event.preventDefault()" ondrop="window.handleDrop(event)">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
-                    </div>
-                    <h4 class="text-slate-700 font-medium mb-1">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</h4>
-                    <p class="text-slate-400 text-xs">รองรับไฟล์ .csv เท่านั้น</p>
-                    <input type="file" id="importFile" accept=".csv" class="hidden" onchange="window.handleFileSelect(this)">
-                </div>
-                <div id="importFileName" class="mt-4 text-center text-sm text-slate-600 hidden">
-                    <span class="font-bold text-brand-600">ไฟล์ที่เลือก:</span> <span id="selectedFileName"></span>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">เหตุผลที่ปฏิเสธ</label>
+                    <textarea class="form-control" id="reject-reason" rows="4"
+                        placeholder="ระบุเหตุผลในการปฏิเสธ..."></textarea>
                 </div>
             </div>
-            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
-                 <button onclick="window.closeImportModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-white text-sm font-medium">ยกเลิก</button>
-                 <button id="btnProcessImport" onclick="window.processImportFile()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>นำเข้าข้อมูล</button>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeRejectModal()">ยกเลิก</button>
+                <button class="btn btn-danger" onclick="confirmReject()">❌ ยืนยันปฏิเสธ</button>
             </div>
         </div>
     </div>
-    
-    <!-- Import Result Modal (New) -->
-    <div id="importResultModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
-            <div id="importResultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm bg-blue-50 text-blue-500"><i class="fa-solid fa-file-import text-3xl"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">ผลการนำเข้า</h3>
-            <div class="text-sm text-slate-600 mb-6 space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                <div class="flex justify-between"><span>รายการทั้งหมด:</span> <span id="resultTotal" class="font-bold">0</span></div>
-                <div class="flex justify-between text-green-600"><span>นำเข้าสำเร็จ:</span> <span id="resultSuccess" class="font-bold">0</span></div>
-                <div class="flex justify-between text-red-500"><span>ไม่ผ่าน/ซ้ำ:</span> <span id="resultFail" class="font-bold">0</span></div>
+
+    <!-- ═══════════════════════════════════════════════
+     MODAL: Login
+═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-login">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0">
+                <div style="text-align:center;width:100%">
+                    <div style="font-size:48px;margin-bottom:8px">🔐</div>
+                    <div class="modal-title" style="font-size:20px">เข้าสู่ระบบการจัดการ</div>
+                    <p style="color:var(--text-muted);font-size:13px;margin-top:4px">กรุณากรอก Username และ Password</p>
+                </div>
             </div>
-            <p id="importNote" class="text-xs text-orange-500 mb-4 hidden">* โปรดระบุรหัสร้านค้าสำหรับรายการที่นำเข้า</p>
-            <button onclick="window.closeImportResultModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow-md transition-all">ตกลง</button>
+            <div class="modal-body" style="padding-top:12px">
+                <div class="form-group" style="margin-bottom:14px">
+                    <label class="form-label">Username</label>
+                    <input class="form-control" type="text" id="login-username" placeholder="admin"
+                        autocomplete="username" />
+                </div>
+                <div class="form-group" style="margin-bottom:6px">
+                    <label class="form-label">Password</label>
+                    <input class="form-control" type="password" id="login-password" placeholder="••••••••"
+                        autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+                </div>
+                <div id="login-error"
+                    style="color:var(--danger);font-size:13px;min-height:20px;margin-top:6px;text-align:center"></div>
+            </div>
+            <div class="modal-footer" style="border-top:none;justify-content:center;padding-top:0">
+                <button class="btn btn-outline" onclick="closeLoginModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="doLogin()" style="min-width:120px">🔑 เข้าสู่ระบบ</button>
+            </div>
         </div>
     </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyAfal6grNtLApn1oiX8p0mbyb4TpsMYrDo",
-            authDomain: "gloy-8831a.firebaseapp.com",
-            databaseURL: "https://gloy-8831a-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "gloy-8831a",
-            storageBucket: "gloy-8831a.firebasestorage.app",
-            messagingSenderId: "920776916154",
-            appId: "1:920776916154:web:eef1247abf4e1d77c89683",
-            measurementId: "G-34F6XB9S9T"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'merchant-control-demo';
-
-        // --- AUTH ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth Error", error);
-            }
-        };
-        initAuth();
-
-        // Variables
-        let rolePermissions = { 'Manager': 'all', 'Accounting': [15, 23, 41, 24, 26, 27], 'IT': [15, 24, 25, 27], 'Staff': [15, 24, 25], 'Sale': [15, 23, 24, 25, 46, 10031] };
-        let roleDescriptions = { 'Manager': 'เข้าถึงได้ทุกเมนู (Full Access)', 'Accounting': 'เน้นดูยอดขายและจัดการการเงิน', 'IT': 'เน้นตั้งค่าระบบและเชื่อมต่อ API', 'Staff': 'ดูรายการสั่งซื้อทั่วไป', 'Sale': '📊 Dashboard: ดูสรุปภาพรวมข้อมูล\n💰 ยอดรวมรายได้: แสดงยอดรวมรายได้ร้านค้า\n📦 รายการสั่งซื้อทั้งหมด: ตรวจสอบประวัติและสถานะการสั่งซื้อ\n💡 Tips: คลังเทคนิคการใช้งาน\n📢 News: ข่าวสารและกิจกรรมใหม่' };
-        
-        // Menu list updated with "order" field
-        let menuItems = [
-            { id: 15, order: 1, name: "แดชบอร์ด", type: 'header', mandatory: true }, 
-            { id: 23, order: 2, name: "ยอดรวมรายได้", type: 'header', mandatory: false }, 
-            { id: 41, order: 3, name: "ประวัติการโอนเงินคืน", type: 'header', mandatory: false }, 
-            { id: 24, order: 4, name: "รายการสั่งซื้อและผู้ซื้อ", type: 'header', mandatory: false }, 
-            { id: 25, order: 1, name: "รายการสั่งซื้อทั้งหมด", type: 'item', parentId: 24 }, 
-            { id: 26, order: 2, name: "คืนเงินหรือยกเลิกรายการ", type: 'item', parentId: 24 }, 
-            { id: 27, order: 3, name: "อัตราแลกเปลี่ยน", type: 'item', parentId: 24 }, 
-            { id: 28, order: 5, name: "จัดการข้อมูลร้านค้า", type: 'header', mandatory: false }, 
-            { id: 29, order: 1, name: "ตั้งค่าเบื้องต้น", type: 'item', parentId: 28 }, 
-            { id: 30, order: 2, name: "ข้อมูลส่วนตัว", type: 'item', parentId: 28 }, 
-            { id: 31, order: 3, name: "แก้ไขข้อมูลส่วนตัว", type: 'item', parentId: 28 }, 
-            { id: 32, order: 4, name: "แก้ไขข้อมูลบัญชีธนาคาร", type: 'item', parentId: 28 }, 
-            { id: 33, order: 5, name: "เปลี่ยนรหัสผ่าน", type: 'item', parentId: 28 }, 
-            { id: 34, order: 6, name: "ข้อมูลใบกำกับภาษี", type: 'item', parentId: 28 }, 
-            { id: 54, order: 7, name: "ส่งค่ากลับเว็บไซต์หลัก", type: 'item', parentId: 28 }, 
-            { id: 10753, order: 6, name: "จัดการเอกสาร", type: 'header', mandatory: false }, 
-            { id: 40, order: 7, name: "ลิงก์ชำระเงิน (Pay.sn)", type: 'header', mandatory: false }, 
-            { id: 5278, order: 1, name: "ลิงก์รับชำระเงินของร้านค้า", type: 'item', parentId: 40 }, 
-            { id: 5279, order: 2, name: "ลิงก์รับชำระเงินแบบกำหนดเวลา", type: 'item', parentId: 40 }, 
-            { id: 46, order: 8, name: "เทคนิคการใช้งาน", type: 'header', mandatory: false }, 
-            { id: 47, order: 9, name: "บริการชำระเงินอัตโนมัติ", type: 'header', mandatory: false }, 
-            { id: 48, order: 1, name: "สร้างรายการชำระเงินอัตโนมัติ", type: 'item', parentId: 47 }, 
-            { id: 49, order: 2, name: "การชำระเงินอัตโนมัติ", type: 'item', parentId: 47 }, 
-            { id: 9531, order: 10, name: "เพิ่มโลโก้ชำระเงินบนเว็บไซต์", type: 'header', mandatory: false }, 
-            { id: 10031, order: 11, name: "ข่าวสารและกิจกรรมใหม่", type: 'header', mandatory: false }, 
-            { id: 10032, order: 12, name: "ดาวน์โหลดใบเสร็จ / ใบกำกับภาษี อิเล็กทรอนิกส์", type: 'header', mandatory: false }, 
-        ];
-        
-        let userQueue = [], requests = [], adminUsersList = [], currentModalBatchId = null, editingMenuId = null, currentSettingsRole = 'Manager', editingRoleKey = null, itemToDelete = null, deleteType = null, isAdminLoggedIn = false, currentUserRole = null;
-        
-        let currentImportFile = null;
-
-        // --- Functions ---
-        function getSortedMenuItems() {
-            const headers = menuItems.filter(m => m.type === 'header').sort((a,b) => (a.order || a.id) - (b.order || b.id));
-            const items = menuItems.filter(m => m.type !== 'header');
-            let sorted = [];
-            headers.forEach(h => {
-                sorted.push(h);
-                const children = items.filter(i => i.parentId === h.id).sort((a,b) => (a.order || a.id) - (b.order || b.id));
-                children.forEach(c => sorted.push(c));
-            });
-            const orphans = items.filter(i => !headers.find(h => h.id === i.parentId));
-            orphans.forEach(o => sorted.push(o));
-            return sorted;
-        }
-
-        function cleanPermissions(permissions) {
-            let permissionSet = new Set(permissions);
-            const parents = menuItems.filter(m => m.type === 'header');
-            parents.forEach(parent => {
-                const children = menuItems.filter(m => m.parentId === parent.id);
-                if (children.length > 0) {
-                    const hasChildSelected = children.some(child => permissionSet.has(child.id));
-                    if (!hasChildSelected) permissionSet.delete(parent.id);
-                    else permissionSet.add(parent.id); 
-                }
-            });
-            menuItems.forEach(m => { if (m.mandatory) permissionSet.add(m.id); });
-            return Array.from(permissionSet);
-        }
-
-        function getCheckboxHTML(item, name) {
-            const isMandatory = item.mandatory;
-            const isHeader = item.type === 'header';
-            const isSub = item.type === 'item';
-            let checkedAttr = isMandatory ? 'checked disabled' : '';
-            const disableIds = [24, 28, 40, 47]; 
-            if (disableIds.includes(item.id)) checkedAttr += ' disabled';
-            const cursorClass = (isMandatory || checkedAttr.includes('disabled')) ? 'cursor-not-allowed opacity-90' : 'cursor-pointer';
-            let containerClass = "flex items-start gap-2 relative group p-1.5 rounded-md hover:bg-slate-50 transition-colors";
-            let textClass = "text-xs text-slate-600 group-hover:text-brand-700 transition-colors";
-            let indentClass = "";
-            let icon = "";
-            if (isHeader) {
-                containerClass += " bg-slate-50/50 border border-slate-100 mb-1";
-                textClass = "text-xs font-bold text-slate-800";
-                if (isMandatory) icon = '<i class="fa-solid fa-shield-halved text-[10px] ml-1.5 text-emerald-500" title="Main Menu (Required)"></i>';
-            } else if (isSub) {
-                indentClass = "pl-6 border-l-2 border-slate-100 ml-1";
-            }
-            return `<div class="${indentClass}"><label class="${containerClass} ${cursorClass}"><input type="checkbox" name="${name}" value="${item.id}" onchange="window.handlePermissionChange(this)" class="mt-0.5 custom-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500" ${checkedAttr}><span class="${textClass}">${item.name}${icon}</span></label></div>`;
-        }
-
-        // --- GLOBAL WINDOW FUNCTIONS ---
-        // Render Functions
-        window.renderRoleRadios = function(containerId, inputName, onChangeFunctionStr) {
-            const container = document.getElementById(containerId);
-            if(!container) return;
-            container.innerHTML = '';
-            Object.keys(rolePermissions).forEach(roleKey => {
-                const label = document.createElement('label');
-                label.className = "cursor-pointer relative";
-                label.innerHTML = `<input type="radio" name="${inputName}" value="${roleKey}" onchange="window.${onChangeFunctionStr}('${roleKey}')" class="peer sr-only"><div class="p-2 border rounded bg-white text-slate-600 hover:bg-slate-50 peer-checked:bg-brand-600 peer-checked:text-white peer-checked:border-brand-600 peer-checked:shadow-md text-center transition-all duration-200"><div class="text-xs font-bold truncate">${roleKey}</div></div>`;
-                container.appendChild(label);
-            });
-        }
-
-        window.renderAllPermissionGrids = function() {
-            const permissionGrid = document.getElementById('permissionGrid');
-            const editPermissionGrid = document.getElementById('editPermissionGrid');
-            const roleSettingsGrid = document.getElementById('roleSettingsGrid');
-            if(permissionGrid) { permissionGrid.innerHTML = ''; permissionGrid.className = "flex flex-col gap-1"; }
-            if(editPermissionGrid) { editPermissionGrid.innerHTML = ''; editPermissionGrid.className = "flex flex-col gap-1"; }
-            if(roleSettingsGrid) { roleSettingsGrid.innerHTML = ''; roleSettingsGrid.className = "flex flex-col gap-1"; }
-            const sortedItems = getSortedMenuItems();
-            sortedItems.forEach(item => {
-                if(permissionGrid) { const div = document.createElement('div'); div.innerHTML = getCheckboxHTML(item, 'permissions'); permissionGrid.appendChild(div); }
-                if(editPermissionGrid) { const div = document.createElement('div'); div.innerHTML = getCheckboxHTML(item, 'editPermissions'); editPermissionGrid.appendChild(div); }
-                if(roleSettingsGrid) { const div = document.createElement('div'); div.innerHTML = getCheckboxHTML(item, 'settingsPermissions'); roleSettingsGrid.appendChild(div); }
-            });
-        }
-
-        window.renderSettingsSidebar = function() {
-            const settingsRoleList = document.getElementById('settingsRoleList');
-            if(!settingsRoleList) return;
-            settingsRoleList.innerHTML = '';
-            const roles = Object.keys(rolePermissions);
-            if(roles.length === 0) { settingsRoleList.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">ไม่มีบทบาท</div>'; return; }
-            roles.forEach(roleKey => {
-                 const container = document.createElement('div');
-                 container.className = `group flex items-center justify-between px-3 py-2 rounded-lg border mb-2 transition-all cursor-pointer ${roleKey === currentSettingsRole ? 'bg-brand-600 border-brand-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:border-brand-300 hover:shadow-sm'}`;
-                 container.onclick = () => window.switchSettingsRole(roleKey);
-                 const span = document.createElement('span'); span.className = 'flex-1 text-sm font-medium truncate select-none'; span.textContent = roleKey;
-                 const actionDiv = document.createElement('div'); actionDiv.className = `flex gap-1 ${roleKey === currentSettingsRole ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`;
-                 const delBtn = document.createElement('button'); delBtn.className = `p-1.5 rounded transition-colors ${roleKey === currentSettingsRole ? 'text-brand-100 hover:bg-brand-500 hover:text-red-200' : 'text-slate-400 hover:bg-slate-100 hover:text-red-500'}`; delBtn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i>'; delBtn.onclick = (e) => { e.stopPropagation(); window.deleteItem(roleKey, 'role'); };
-                 actionDiv.appendChild(delBtn); container.appendChild(span); container.appendChild(actionDiv); settingsRoleList.appendChild(container);
-            });
-        }
-
-        window.renderAllRoleUIs = function() {
-            window.renderSettingsSidebar();
-            window.renderRoleRadios('mainRoleGrid', 'role', 'applyRole');
-            window.renderRoleRadios('editRoleGrid', 'editRole', 'applyEditRole');
-        }
-
-        window.renderAdminTable = function() {
-            const requestTableBody = document.getElementById('requestTableBody');
-            const emptyState = document.getElementById('emptyState');
-            if(!requestTableBody) return;
-            
-            requestTableBody.innerHTML = '';
-            const searchTerm = document.getElementById('adminSearchInput') ? document.getElementById('adminSearchInput').value.toLowerCase() : '';
-            
-            const filteredRequests = requests.filter(req => {
-                if (!searchTerm) return true;
-                return (
-                    (req.merchantId && req.merchantId.toLowerCase().includes(searchTerm)) ||
-                    (req.merchantName && req.merchantName.toLowerCase().includes(searchTerm)) ||
-                    (req.batchId && req.batchId.toLowerCase().includes(searchTerm)) ||
-                    (req.fullName && req.fullName.toLowerCase().includes(searchTerm))
-                );
-            });
-
-            if (filteredRequests.length === 0) {
-                if(emptyState) emptyState.classList.remove('hidden'); 
-                return;
-            } else {
-                if(emptyState) emptyState.classList.add('hidden');
-            }
-
-            const batches = {};
-            filteredRequests.forEach(req => {
-                if (!batches[req.batchId]) {
-                    // Convert createdAt to date string
-                    let displayDate = '-';
-                    if(req.createdAt) {
-                        const dateObj = req.createdAt.toDate ? req.createdAt.toDate() : new Date(req.createdAt.seconds * 1000);
-                        displayDate = dateObj.toLocaleDateString('th-TH', {
-                            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                        });
-                    }
-
-                    batches[req.batchId] = {
-                        batchId: req.batchId,
-                        date: displayDate,
-                        merchantId: req.merchantId,
-                        merchantName: req.merchantName,
-                        totalUsers: 0,
-                        pendingUsers: 0,
-                        approvedUsers: 0,
-                        rejectedUsers: 0,
-                        users: [] 
-                    };
-                }
-                batches[req.batchId].totalUsers++;
-                if(req.status === 'pending') batches[req.batchId].pendingUsers++;
-                if(req.status === 'completed') batches[req.batchId].approvedUsers++; 
-                if(req.status === 'rejected') batches[req.batchId].rejectedUsers++;
-                batches[req.batchId].users.push(req);
-            });
-
-            const sortedBatches = Object.values(batches).sort((a, b) => 0); 
-
-            sortedBatches.forEach(batch => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0';
-                
-                let statusBadge = '';
-                if (batch.pendingUsers > 0) {
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><span class="w-1.5 h-1.5 mr-1.5 bg-yellow-400 rounded-full"></span>รอดำเนินการ (${batch.pendingUsers})</span>`;
-                } else {
-                    statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">ดำเนินการเรียบร้อยแล้ว</span>`;
-                }
-
-                tr.innerHTML = `
-                    <td class="p-4 text-slate-500">${batch.date}</td>
-                    <td class="p-4">
-                        <div class="font-medium text-slate-800 max-w-[200px] truncate" title="${batch.merchantId}">${batch.merchantId}</div>
-                        <div class="text-xs text-slate-500 max-w-[200px] truncate mt-0.5" title="${batch.merchantName}">${batch.merchantName}</div>
-                        <div class="text-[10px] text-slate-400 mt-1">Ref: ${batch.batchId}</div>
-                    </td>
-                    <td class="p-4 text-center">
-                        <span class="font-bold text-slate-700">${batch.totalUsers}</span> <span class="text-xs text-slate-400">คน</span>
-                    </td>
-                    <td class="p-4 text-center">${statusBadge}</td>
-                    <td class="p-4 text-right">
-                        <button onclick="window.openDetailModal('${batch.batchId}')" class="text-brand-600 hover:text-brand-800 text-sm font-medium bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fa-solid fa-eye mr-1"></i> ดูรายละเอียด
-                        </button>
-                    </td>
-                `;
-                requestTableBody.appendChild(tr);
-            });
-            
-            window.updateStats();
-        }
-
-        window.renderAdminUsersTable = function() {
-            if(!document.getElementById('adminUsersTable')) return;
-            const tbody = document.getElementById('adminUsersTable');
-            tbody.innerHTML = '';
-            adminUsersList.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0";
-                let roleBadge = '';
-                if(user.role === 'admin') roleBadge = `<span class="bg-brand-100 text-brand-700 px-2 py-0.5 rounded text-[10px] font-bold">ADMIN</span>`;
-                else roleBadge = `<span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[10px] font-bold">SALE</span>`;
-                tr.innerHTML = `<td class="px-4 py-3 text-slate-700 font-medium">${user.username}</td><td class="px-4 py-3 text-slate-500">${user.name}</td><td class="px-4 py-3">${roleBadge}</td><td class="px-4 py-3 text-right"><button onclick="window.editAdminUser('${user.id}')" class="text-brand-400 hover:bg-brand-50 p-1.5 rounded transition-colors mr-1"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteItem('${user.id}', 'adminUser')" class="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"><i class="fa-solid fa-trash-can"></i></button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        window.updateStats = function() {
-            const pendingCountEl = document.getElementById('pendingCount');
-            const approvedCountEl = document.getElementById('approvedCount');
-            if(pendingCountEl) pendingCountEl.textContent = requests.filter(r => r.status === 'pending').length;
-            if(approvedCountEl) approvedCountEl.textContent = requests.filter(r => r.status === 'approved').length;
-        }
-
-        window.searchRequests = function() {
-            window.renderAdminTable();
-        }
-
-        // --- Modals & Actions ---
-        window.openAdminUsersModal = function() {
-            document.getElementById('adminUsersModal').classList.remove('hidden');
-            window.renderAdminUsersTable();
-            window.resetAdminUserForm();
-        }
-
-        window.closeAdminUsersModal = function() {
-             document.getElementById('adminUsersModal').classList.add('hidden');
-        }
-
-        window.openRoleSettingsModal = function() {
-            document.getElementById('roleSettingsModal').classList.remove('hidden');
-            window.renderSettingsSidebar();
-        }
-
-        window.closeRoleSettingsModal = function() {
-            document.getElementById('roleSettingsModal').classList.add('hidden');
-        }
-
-        // --- MISSING MENU FUNCTIONS ADDED HERE ---
-        window.openMenuSettingsModal = function() {
-            document.getElementById('menuSettingsModal').classList.remove('hidden');
-            window.updateParentOptions(); 
-            window.renderMenuManagerTable();
-        }
-
-        window.closeMenuSettingsModal = function() {
-            document.getElementById('menuSettingsModal').classList.add('hidden');
-            editingMenuId = null;
-        }
-
-        window.updateParentOptions = function(selectedId = null) {
-            const select = document.getElementById('newMenuParent');
-            if(!select) return;
-            select.innerHTML = '<option value="">- เป็นเมนูหลัก -</option>';
-            const headers = menuItems.filter(m => m.type === 'header').sort((a,b) => (a.order || a.id) - (b.order || b.id));
-            headers.forEach(h => {
-                const option = document.createElement('option');
-                option.value = h.id;
-                option.textContent = h.name;
-                if(selectedId && h.id == selectedId) option.selected = true;
-                select.appendChild(option);
-            });
-            window.toggleMandatoryCheck();
-        }
-
-        window.toggleMandatoryCheck = function() {
-            const mandatoryCheck = document.getElementById('newMenuMandatory');
-            const mandatoryContainer = document.getElementById('newMenuMandatoryContainer');
-            if(!mandatoryCheck || !mandatoryContainer) return;
-            
-            const parentSelect = document.getElementById('newMenuParent');
-            if(parentSelect && parentSelect.value) {
-                // If it's a sub-menu, it cannot be mandatory (logic choice) or can be? 
-                // Let's assume sub-menus can be mandatory too.
-                mandatoryContainer.classList.remove('opacity-50');
-                mandatoryCheck.disabled = false;
-            } else {
-                // If main menu
-                mandatoryContainer.classList.remove('opacity-50');
-                mandatoryCheck.disabled = false;
-            }
-        }
-
-        window.renderMenuManagerTable = function() {
-            const tbody = document.getElementById('menuManagerTable');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const displayItems = getSortedMenuItems();
-            displayItems.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0";
-                
-                if (item.id === editingMenuId) {
-                    // Edit mode
-                    tr.classList.add('bg-brand-50');
-                    let parentOptions = '<option value="">- เมนูหลัก -</option>';
-                    menuItems.filter(m => m.type === 'header' && m.id !== item.id).forEach(h => {
-                        const sel = item.parentId === h.id ? 'selected' : '';
-                        parentOptions += `<option value="${h.id}" ${sel}>${h.name}</option>`;
-                    });
-                    
-                    tr.innerHTML = `
-                        <td class="px-4 py-3"><input type="number" id="editMenuIdInput-${item.id}" value="${item.id}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none text-center bg-white text-slate-700" disabled></td>
-                        <td class="px-4 py-3"><input type="number" id="editMenuOrderInput-${item.id}" value="${item.order || 0}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none text-center"></td>
-                        <td class="px-4 py-3"><input type="text" id="editMenuNameInput-${item.id}" value="${item.name}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none"></td>
-                        <td class="px-4 py-3"><select id="editMenuParentInput-${item.id}" class="w-full px-2 py-1 text-xs border border-brand-300 rounded outline-none">${parentOptions}</select></td>
-                        <td class="px-4 py-3 text-center"><input type="checkbox" id="editMenuMandatoryInput-${item.id}" ${item.mandatory ? 'checked' : ''} class="w-4 h-4 text-brand-600 rounded"></td>
-                        <td class="px-4 py-3 text-right"><button onclick="window.saveEditedMenu(${item.id})" class="text-white bg-green-500 hover:bg-green-600 p-1.5 rounded mr-1 shadow-sm"><i class="fa-solid fa-check"></i></button><button onclick="window.cancelEditMenu()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded"><i class="fa-solid fa-xmark"></i></button></td>
-                    `;
-                } else {
-                    // View mode
-                    const parentName = item.parentId ? (menuItems.find(m => m.id === item.parentId)?.name || '-') : '<span class="text-brand-400 font-bold">Main</span>';
-                    const nameStyle = item.type === 'header' ? "font-bold text-slate-800" : "text-slate-600 pl-4 border-l-2 border-brand-100 ml-2";
-                    
-                    tr.innerHTML = `
-                        <td class="px-4 py-3 text-center text-slate-500 text-xs font-mono">${item.id}</td>
-                        <td class="px-4 py-3 text-center text-slate-500 text-xs">${item.order || 0}</td>
-                        <td class="px-4 py-3"><span class="${nameStyle}">${item.name}</span></td>
-                        <td class="px-4 py-3 text-xs text-slate-500">${parentName}</td>
-                        <td class="px-4 py-3 text-center">${item.mandatory ? '<span class="text-emerald-500"><i class="fa-solid fa-check"></i></span>' : '-'}</td>
-                        <td class="px-4 py-3 text-right"><button onclick="window.startEditMenu(${item.id})" class="text-brand-400 hover:bg-brand-50 p-1.5 rounded transition-colors mr-1"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteItem(${item.id}, 'menu')" class="text-red-400 hover:bg-red-50 p-1.5 rounded transition-colors"><i class="fa-solid fa-trash-can"></i></button></td>
-                    `;
-                }
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.addNewMenu = function() {
-            const idInput = document.getElementById('newMenuId');
-            const orderInput = document.getElementById('newMenuOrder');
-            const nameInput = document.getElementById('newMenuName');
-            const parentSelect = document.getElementById('newMenuParent');
-            const mandatoryInput = document.getElementById('newMenuMandatory');
-            
-            const name = nameInput.value.trim();
-            if (!name) { alert("กรุณาระบุชื่อเมนู"); return; }
-            
-            let newId = parseInt(idInput.value);
-            if (!newId) newId = menuItems.length > 0 ? Math.max(...menuItems.map(m => m.id)) + 1 : 1;
-            
-            let newOrder = parseInt(orderInput.value) || 0;
-            const parentId = parentSelect.value ? parseInt(parentSelect.value) : null;
-            const type = parentId ? 'item' : 'header';
-            
-            menuItems.push({ id: newId, order: newOrder, name: name, type: type, parentId: parentId, mandatory: mandatoryInput.checked });
-            window.saveMenusToFirebase();
-            
-            nameInput.value = '';
-            idInput.value = '';
-            orderInput.value = '0';
-            mandatoryInput.checked = false;
-            window.updateParentOptions();
-            window.renderMenuManagerTable();
-        }
-
-        window.startEditMenu = function(id) {
-            editingMenuId = id;
-            window.renderMenuManagerTable();
-        }
-
-        window.cancelEditMenu = function() {
-            editingMenuId = null;
-            window.renderMenuManagerTable();
-        }
-
-        window.saveEditedMenu = function(originalId) {
-            const nameInput = document.getElementById(`editMenuNameInput-${originalId}`);
-            const orderInput = document.getElementById(`editMenuOrderInput-${originalId}`);
-            const parentInput = document.getElementById(`editMenuParentInput-${originalId}`);
-            const mandatoryInput = document.getElementById(`editMenuMandatoryInput-${originalId}`);
-            
-            if(!nameInput) return;
-            
-            const index = menuItems.findIndex(m => m.id === originalId);
-            if(index !== -1) {
-                menuItems[index].name = nameInput.value.trim();
-                menuItems[index].order = parseInt(orderInput.value) || 0;
-                menuItems[index].parentId = parentInput.value ? parseInt(parentInput.value) : null;
-                menuItems[index].type = menuItems[index].parentId ? 'item' : 'header';
-                menuItems[index].mandatory = mandatoryInput.checked;
-                
-                window.saveMenusToFirebase();
-                editingMenuId = null;
-                window.renderMenuManagerTable();
-            }
-        }
-        // ------------------------------------
-        
-        // --- IMPORT CSV FUNCTIONALITY ---
-        window.openImportModal = function() {
-            document.getElementById('importModal').classList.remove('hidden');
-            currentImportFile = null;
-            document.getElementById('importFile').value = '';
-            document.getElementById('importFileName').classList.add('hidden');
-            document.getElementById('btnProcessImport').disabled = true;
-            document.getElementById('btnProcessImport').classList.add('opacity-50', 'cursor-not-allowed');
-        }
-
-        window.closeImportModal = function() {
-            document.getElementById('importModal').classList.add('hidden');
-        }
-
-        window.handleFileSelect = function(input) {
-            const file = input.files[0];
-            if (file) {
-                currentImportFile = file;
-                document.getElementById('selectedFileName').textContent = file.name;
-                document.getElementById('importFileName').classList.remove('hidden');
-                
-                const btn = document.getElementById('btnProcessImport');
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        window.handleDrop = function(e) {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file && file.name.endsWith('.csv')) {
-                 currentImportFile = file;
-                 document.getElementById('selectedFileName').textContent = file.name;
-                 document.getElementById('importFileName').classList.remove('hidden');
-                 
-                 const btn = document.getElementById('btnProcessImport');
-                 btn.disabled = false;
-                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        window.processImportFile = function() {
-            if (!currentImportFile) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                window.closeImportModal();
-                if (text.includes("--- Merchant Information ---")) {
-                    window.processMatrixCSV(text);
-                } else {
-                    window.processSimpleCSV(text);
-                }
-            };
-            reader.readAsText(currentImportFile);
-        }
-
-        window.showImportResult = function(success, fail) {
-            document.getElementById('resultTotal').textContent = success + fail;
-            document.getElementById('resultSuccess').textContent = success;
-            document.getElementById('resultFail').textContent = fail;
-            
-            // Note for Simple CSV
-            const note = document.getElementById('importNote');
-            if(success > 0 && !document.querySelector('input[name="merchantId"]').value) {
-               note.classList.remove('hidden');
-            } else {
-               note.classList.add('hidden');
-            }
-
-            document.getElementById('importResultModal').classList.remove('hidden');
-        }
-
-        window.closeImportResultModal = function() {
-             document.getElementById('importResultModal').classList.add('hidden');
-        }
-
-        window.processSimpleCSV = function(text) {
-            const lines = text.split('\n');
-            let successCount = 0;
-            let failCount = 0;
-            
-            let startIndex = 0;
-            if (lines[0].toLowerCase().includes('username') && lines[0].toLowerCase().includes('email')) {
-                startIndex = 1;
-            }
-            
-            // Get Shared Merchant Info
-            const merchantId = document.querySelector('input[name="merchantId"]').value;
-            const merchantName = document.querySelector('input[name="merchantName"]').value;
-
-            for (let i = startIndex; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-                
-                if (parts.length >= 2) {
-                    const username = parts[0];
-                    const email = parts[1];
-                    const roleName = parts[2] || 'Custom';
-                    
-                    // Validation
-                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    const thaiPattern = /[ก-๙]/;
-                    
-                    if (!emailPattern.test(email) || thaiPattern.test(username)) {
-                        failCount++;
-                        continue;
-                    }
-                    
-                    if (userQueue.some(u => u.fullName.toLowerCase() === username.toLowerCase())) {
-                         failCount++;
-                         continue;
-                    }
-
-                    let role = 'Custom';
-                    let perms = [];
-                    const matchedRole = Object.keys(rolePermissions).find(k => k.toLowerCase() === roleName.toLowerCase());
-                    
-                    if (matchedRole) {
-                        role = matchedRole;
-                        const rolePerms = rolePermissions[matchedRole];
-                        perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
-                    } else {
-                         role = 'Custom';
-                         perms = menuItems.filter(m => m.mandatory).map(m => m.id);
-                    }
-
-                    userQueue.push({
-                        tempId: Date.now() + i,
-                        fullName: username,
-                        email: email,
-                        role: role,
-                        permissionCount: perms.length,
-                        permissions: perms,
-                        merchantId: merchantId,
-                        merchantName: merchantName || '-'
-                    });
-                    successCount++;
-                }
-            }
-            
-            window.renderQueue();
-            window.showImportResult(successCount, failCount);
-            
-            if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
-        }
-
-        window.processMatrixCSV = function(text) {
-             const lines = text.split('\n').map(l => l.trim());
-
-             // Helper to parse CSV line
-             const parseCSVValue = (str) => {
-                 if (!str) return '';
-                 str = str.trim();
-                 if (str.startsWith('"')) {
-                     const closeQuoteIndex = str.indexOf('"', 1);
-                     if (closeQuoteIndex !== -1) {
-                         return str.substring(1, closeQuoteIndex);
-                     }
-                 }
-                 const commaIndex = str.indexOf(',');
-                 if (commaIndex !== -1) {
-                     return str.substring(0, commaIndex).trim();
-                 }
-                 return str.trim();
-             };
-
-             // EXTRACT MERCHANT INFO
-             for(const line of lines) {
-                 if (line.startsWith("Lead No,")) {
-                     let valuePart = line.substring("Lead No,".length);
-                     const val = parseCSVValue(valuePart);
-                     if(val && val !== '-') document.querySelector('input[name="leadNo"]').value = val;
-                 }
-                 if (line.startsWith("Merchant ID,")) {
-                     let valuePart = line.substring("Merchant ID,".length);
-                     const val = parseCSVValue(valuePart);
-                     if(val && val !== '-') document.querySelector('input[name="merchantId"]').value = val;
-                 }
-                 if (line.startsWith("Merchant Name,")) {
-                     let valuePart = line.substring("Merchant Name,".length);
-                     const val = parseCSVValue(valuePart);
-                     if(val && val !== '-') document.querySelector('input[name="merchantName"]').value = val;
-                 }
-             }
-             
-             let userSectionIndex = -1;
-             for(let i=0; i<lines.length; i++) {
-                 if(lines[i].includes("--- User Details ---")) {
-                     userSectionIndex = i;
-                     break;
-                 }
-             }
-
-             if (userSectionIndex === -1) {
-                 alert("ไม่พบข้อมูลผู้ใช้งานในไฟล์ (User Details Section not found)");
-                 return;
-             }
-             
-             const parseLine = (line) => {
-                 const firstComma = line.indexOf(',');
-                 if (firstComma === -1) return [];
-                 return line.substring(firstComma + 1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-             };
-             
-             let usernames = [], roles = [], emails = [];
-             
-             for(let i=userSectionIndex; i<userSectionIndex+10 && i<lines.length; i++) {
-                 if(lines[i].startsWith("User Name,")) usernames = parseLine(lines[i]);
-                 if(lines[i].startsWith("Role,")) roles = parseLine(lines[i]);
-                 if(lines[i].startsWith("Email,")) emails = parseLine(lines[i]);
-             }
-             
-             if(usernames.length === 0) {
-                  alert("ไม่พบรายชื่อผู้ใช้งาน");
-                  return;
-             }
-             
-             // NEW: Parse Permission Matrix if it exists
-             let hasMatrix = false;
-             let matrixStartIndex = lines.findIndex(l => l.includes("--- Permission Access Matrix"));
-             let userMatrixPerms = Array(usernames.length).fill().map(() => []);
-
-             if (matrixStartIndex !== -1) {
-                 hasMatrix = true;
-                 for (let i = matrixStartIndex + 2; i < lines.length; i++) {
-                     let line = lines[i].trim();
-                     if (!line) continue;
-                     
-                     let menuName = '';
-                     let valuesStr = '';
-                     if (line.startsWith('"')) {
-                         let closeQuote = line.indexOf('"', 1);
-                         if(closeQuote !== -1) {
-                             menuName = line.substring(1, closeQuote);
-                             valuesStr = line.substring(closeQuote + 2);
-                         }
-                     } else {
-                         let firstComma = line.indexOf(',');
-                         if(firstComma !== -1) {
-                             menuName = line.substring(0, firstComma).trim();
-                             valuesStr = line.substring(firstComma + 1);
-                         }
-                     }
-                     
-                     if(!menuName) continue;
-                     
-                     let matchedMenu = menuItems.find(m => m.name === menuName);
-                     if (matchedMenu) {
-                         let values = valuesStr.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-                         for(let u = 0; u < usernames.length; u++) {
-                             if (values[u] === '1') {
-                                 userMatrixPerms[u].push(matchedMenu.id);
-                             }
-                         }
-                     }
-                 }
-             }
-             
-             let successCount = 0;
-             let failCount = 0;
-             const merchantId = document.querySelector('input[name="merchantId"]').value;
-             const merchantName = document.querySelector('input[name="merchantName"]').value;
-             
-             for(let i=0; i<usernames.length; i++) {
-                 const u = usernames[i];
-                 const e = emails[i] || '';
-                 const r = roles[i] || 'Custom';
-                 
-                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                 const thaiPattern = /[ก-๙]/;
-                 
-                 if (!emailPattern.test(e) || thaiPattern.test(u)) {
-                     failCount++;
-                     continue;
-                 }
-                 if (userQueue.some(existing => existing.fullName.toLowerCase() === u.toLowerCase())) {
-                     failCount++;
-                     continue;
-                 }
-
-                 let finalRole = 'Custom';
-                 let perms = [];
-                 const matchedRole = Object.keys(rolePermissions).find(k => k.toLowerCase() === r.toLowerCase());
-                 
-                 if (hasMatrix) {
-                     // If matrix is found in CSV, strictly follow the matrix permissions for each user
-                     perms = userMatrixPerms[i] || [];
-                     if (matchedRole) {
-                         finalRole = matchedRole;
-                     } else {
-                         finalRole = 'Custom';
-                     }
-                 } else {
-                     // Fallback to Role preset if no matrix exists
-                     if (matchedRole) {
-                         finalRole = matchedRole;
-                         const rolePerms = rolePermissions[matchedRole];
-                         perms = rolePerms === 'all' ? menuItems.map(m => m.id) : rolePerms;
-                     } else {
-                          finalRole = 'Custom';
-                          perms = menuItems.filter(m => m.mandatory).map(m => m.id);
-                     }
-                 }
-
-                 // Ensure mandatory menus are ALWAYS included
-                 let permSet = new Set(perms);
-                 const parents = menuItems.filter(m => m.type === 'header');
-                 parents.forEach(p => {
-                     const children = menuItems.filter(c => c.parentId === p.id);
-                     if(children.length > 0) {
-                         const hasChild = children.some(c => permSet.has(c.id));
-                         if(!hasChild) permSet.delete(p.id); else permSet.add(p.id);
-                     }
-                 });
-                 menuItems.forEach(m => { if(m.mandatory) permSet.add(m.id); });
-                 perms = Array.from(permSet);
-
-                 userQueue.push({
-                     tempId: Date.now() + i,
-                     fullName: u,
-                     email: e,
-                     role: finalRole,
-                     permissionCount: perms.length,
-                     permissions: perms,
-                     merchantId: merchantId,
-                     merchantName: merchantName || '-'
-                 });
-                 successCount++;
-             }
-
-             window.renderQueue();
-             if(userQueue.length > 0) document.getElementById('queueSection').classList.remove('hidden');
-             window.showImportResult(successCount, failCount);
-        }
-
-        window.saveAdminUser = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('adminUserId').value;
-            const u = document.getElementById('adminUsername').value.trim();
-            const p = document.getElementById('adminPassword').value.trim();
-            const n = document.getElementById('adminDisplayName').value.trim();
-            const r = document.getElementById('adminRole').value;
-            
-            if(!u || !p || !n) { window.showValidationModal("กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
-            if (adminUsersList.some(user => user.username === u && user.id !== id)) { window.showValidationModal('Username นี้มีผู้ใช้งานแล้ว'); return; }
-            
-            const btn = document.getElementById('btnSaveAdminUser');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังบันทึก...';
-            btn.disabled = true;
-
-            const userData = { username: u, password: p, name: n, role: r };
-            try {
-                if (id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', id), userData);
-                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_users'), userData);
-                window.resetAdminUserForm();
-            } catch (err) { 
-                console.error("Error saving user:", err); 
-                window.showValidationModal("เกิดข้อผิดพลาดในการบันทึก"); 
-            } finally {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }
-        }
-
-        window.editAdminUser = function(id) {
-            const user = adminUsersList.find(u => u.id === id);
-            if(!user) return;
-            document.getElementById('adminUserId').value = user.id;
-            document.getElementById('adminUsername').value = user.username;
-            document.getElementById('adminPassword').value = user.password;
-            document.getElementById('adminDisplayName').value = user.name;
-            document.getElementById('adminRole').value = user.role;
-        }
-
-        window.resetAdminUserForm = function() {
-            document.getElementById('addAdminUserForm').reset();
-            document.getElementById('adminUserId').value = '';
-        }
-
-        window.saveRolesToFirebase = async function() {
-            try {
-                const rolesDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings_roles', 'default');
-                await setDoc(rolesDocRef, { roles: rolePermissions, descriptions: roleDescriptions });
-            } catch (error) { console.error("Error saving roles:", error); }
-        }
-
-        window.saveMenusToFirebase = async function() {
-            try {
-                const menusDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings_menus', 'default');
-                await setDoc(menusDocRef, { items: menuItems });
-            } catch (error) { console.error("Error saving menus:", error); }
-        }
-
-        window.handlePermissionChange = function(checkbox) {
-            const id = parseInt(checkbox.value);
-            const item = menuItems.find(m => m.id === id);
-            const groupName = checkbox.name;
-            if (item && item.parentId) {
-                const parentId = item.parentId;
-                const parentCb = document.querySelector(`input[name="${groupName}"][value="${parentId}"]`);
-                if (parentCb) {
-                    const parentItem = menuItems.find(m => m.id === parentId);
-                    if (checkbox.checked) {
-                        parentCb.checked = true;
-                    } else {
-                        if (!parentItem.mandatory) {
-                            const siblings = menuItems.filter(m => m.parentId === parentId);
-                            let anySiblingChecked = false;
-                            for (const sibling of siblings) {
-                                const siblingCb = document.querySelector(`input[name="${groupName}"][value="${sibling.id}"]`);
-                                if (siblingCb && siblingCb.checked) { anySiblingChecked = true; break; }
-                            }
-                            if (!anySiblingChecked) parentCb.checked = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        window.toggleAll = function(checked, clearRoles = true) {
-            document.querySelectorAll('input[name="permissions"]').forEach(cb => {
-                const id = parseInt(cb.value);
-                const item = menuItems.find(m => m.id === id);
-                if (checked) {
-                    if (!cb.disabled) cb.checked = true;
-                    if (cb.disabled && item && !item.mandatory && item.type === 'header') cb.checked = true;
-                } else {
-                    if (item && item.mandatory) cb.checked = true;
-                    else cb.checked = false;
-                }
-            });
-            if(!checked && clearRoles) {
-                 document.querySelectorAll('input[name="role"]').forEach(r => r.checked = false);
-                 document.getElementById('roleDescription').classList.add('hidden');
-            }
-        }
-
-        window.toggleSettingsAll = function(checked) {
-             document.querySelectorAll('input[name="settingsPermissions"]').forEach(cb => {
-                const id = parseInt(cb.value);
-                const item = menuItems.find(m => m.id === id);
-                if (checked) {
-                    if (!cb.disabled) cb.checked = true;
-                } else {
-                    if (item && item.mandatory) cb.checked = true;
-                    else if (!cb.disabled) cb.checked = false;
-                }
-            });
-        }
-        
-        window.applyRole = function(roleName) {
-            window.toggleAll(false, false); 
-            const checkboxes = document.querySelectorAll('input[name="permissions"]');
-            let targetIds = rolePermissions[roleName] === 'all' ? menuItems.map(m => m.id) : rolePermissions[roleName] || [];
-            checkboxes.forEach(cb => {
-                const id = parseInt(cb.value);
-                const item = menuItems.find(m => m.id === id);
-                if ((item && item.mandatory) || targetIds.includes(id)) cb.checked = true;
-            });
-            const descBox = document.getElementById('roleDescription');
-            if (roleDescriptions[roleName]) {
-                const displayDesc = roleDescriptions[roleName].replace(/\n/g, '<br>');
-                descBox.innerHTML = `<strong><i class="fa-solid fa-circle-info mr-1"></i> ${roleName} Description:</strong><br><div class="mt-1 pl-4 border-l-2 border-brand-200 text-slate-500">${displayDesc}</div>`;
-                descBox.classList.remove('hidden');
-            } else {
-                descBox.classList.add('hidden');
-            }
-        }
-
-        window.applyEditRole = function(roleName) {
-             const checkboxes = document.querySelectorAll('input[name="editPermissions"]');
-             checkboxes.forEach(cb => cb.checked = false); 
-             let targetIds = rolePermissions[roleName] === 'all' ? menuItems.map(m => m.id) : rolePermissions[roleName] || [];
-             checkboxes.forEach(cb => {
-                 const id = parseInt(cb.value);
-                 const item = menuItems.find(m => m.id === id);
-                 if ((item && item.mandatory) || targetIds.includes(id)) cb.checked = true;
-             });
-        }
-
-        window.switchSettingsRole = function(roleName) {
-            currentSettingsRole = roleName;
-            const titleEl = document.getElementById('currentRoleTitle');
-            if(titleEl) titleEl.textContent = `Editing: ${roleName}`;
-            window.renderSettingsSidebar();
-            
-            const descInput = document.getElementById('roleDescriptionInput');
-            if(descInput) descInput.value = roleDescriptions[roleName] || '';
-            
-            const checkboxes = document.querySelectorAll('input[name="settingsPermissions"]');
-            let targetIds = rolePermissions[roleName] === 'all' ? menuItems.map(m => m.id) : rolePermissions[roleName] || [];
-            checkboxes.forEach(cb => {
-                const id = parseInt(cb.value);
-                const item = menuItems.find(m => m.id === id);
-                if (item && item.mandatory) { cb.checked = true; cb.disabled = true; }
-                else { cb.checked = targetIds.includes(id); cb.disabled = false; }
-            });
-        }
-
-        window.addNewRole = function() {
-            const input = document.getElementById('newRoleNameInput');
-            const roleName = input.value.trim();
-            if (!roleName) { window.showValidationModal('กรุณาระบุชื่อบทบาท'); return; }
-            if (Object.keys(rolePermissions).some(k => k.toLowerCase() === roleName.toLowerCase())) { window.showValidationModal('ชื่อบทบาทนี้มีอยู่แล้ว'); return; }
-            rolePermissions[roleName] = menuItems.filter(m => m.mandatory).map(m => m.id);
-            roleDescriptions[roleName] = "";
-            input.value = '';
-            window.saveRolesToFirebase().then(() => { window.renderAllRoleUIs(); window.switchSettingsRole(roleName); });
-        }
-
-        window.restoreDefaultRoles = function() {
-            if(!confirm('คุณต้องการคืนค่าบทบาทเริ่มต้นใช่หรือไม่? บทบาทที่คุณสร้างเพิ่มจะหายไป')) return;
-            rolePermissions = { 'Manager': 'all', 'Accounting': [15, 23, 41, 24, 26, 27], 'IT': [15, 24, 25, 27], 'Staff': [15, 24, 25], 'Sale': [15, 23, 24, 25, 46, 10031] };
-            roleDescriptions = { 'Manager': 'เข้าถึงได้ทุกเมนู (Full Access)', 'Accounting': 'เน้นดูยอดขายและจัดการการเงิน', 'IT': 'เน้นตั้งค่าระบบและเชื่อมต่อ API', 'Staff': 'ดูรายการสั่งซื้อทั่วไป', 'Sale': '📊 Dashboard: ดูสรุปภาพรวมข้อมูล\n💰 ยอดรวมรายได้: แสดงยอดรวมรายได้ร้านค้า\n📦 รายการสั่งซื้อทั้งหมด: ตรวจสอบประวัติและสถานะการสั่งซื้อ\n💡 Tips: คลังเทคนิคการใช้งาน\n📢 News: ข่าวสารและกิจกรรมใหม่' };
-            currentSettingsRole = 'Manager';
-            window.saveRolesToFirebase().then(() => { 
-                window.renderAllRoleUIs(); 
-                window.switchSettingsRole(currentSettingsRole);
-                window.showValidationModal('คืนค่าเริ่มต้นเรียบร้อยแล้ว');
-            });
-        }
-        
-        window.saveRoleSettings = function() {
-             const checkboxes = document.querySelectorAll('input[name="settingsPermissions"]:checked');
-             let selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
-             // Ensure mandatory
-             menuItems.forEach(m => { if(m.mandatory && !selectedIds.includes(m.id)) selectedIds.push(m.id); });
-             
-             if(selectedIds.length === menuItems.length) rolePermissions[currentSettingsRole] = 'all';
-             else rolePermissions[currentSettingsRole] = selectedIds;
-             
-             const descInput = document.getElementById('roleDescriptionInput');
-             if(descInput) roleDescriptions[currentSettingsRole] = descInput.value;
-             
-             window.saveRolesToFirebase().then(() => {
-                 const btn = document.getElementById('btnSaveRoleSettings');
-                 const oldHtml = btn.innerHTML;
-                 btn.innerHTML = '<i class="fa-solid fa-check"></i> บันทึกแล้ว';
-                 setTimeout(() => btn.innerHTML = oldHtml, 1500);
-             });
-        }
-        
-        window.deleteItem = function(key, type) {
-            itemToDelete = key;
-            deleteType = type;
-            let displayName = '';
-            if (type === 'role') displayName = key;
-            else if (type === 'menu') displayName = menuItems.find(m => m.id === key)?.name;
-            else if (type === 'adminUser') displayName = adminUsersList.find(u => u.id === key)?.username;
-            
-            document.getElementById('deleteItemNameDisplay').textContent = displayName || 'รายการนี้';
-            document.getElementById('deleteConfirmModal').classList.remove('hidden');
-        }
-
-        window.executeDelete = function() {
-            if (!itemToDelete || !deleteType) return;
-            
-            const btn = document.getElementById('btnConfirmDelete');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังลบ...';
-            btn.disabled = true;
-
-            const onComplete = () => {
-                 window.closeDeleteConfirmModal();
-                 btn.innerHTML = originalContent;
-                 btn.disabled = false;
-            };
-
-            if (deleteType === 'role') {
-                delete rolePermissions[itemToDelete];
-                delete roleDescriptions[itemToDelete];
-                if(currentSettingsRole === itemToDelete) window.switchSettingsRole(Object.keys(rolePermissions)[0] || '');
-                window.saveRolesToFirebase().then(() => { window.renderAllRoleUIs(); onComplete(); });
-            } else if (deleteType === 'menu') {
-                menuItems = menuItems.filter(m => m.id !== itemToDelete);
-                window.saveMenusToFirebase().then(() => { window.renderMenuManagerTable(); onComplete(); });
-            } else if (deleteType === 'adminUser') {
-                deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', itemToDelete)).then(() => {
-                     // Force refresh list from memory for instant feedback while waiting for snapshot
-                     adminUsersList = adminUsersList.filter(u => u.id !== itemToDelete);
-                     window.renderAdminUsersTable();
-                     onComplete();
-                }).catch(err => {
-                    console.error(err);
-                    window.showValidationModal('ลบไม่สำเร็จ');
-                    onComplete();
-                });
-            }
-        }
-        
-        window.closeDeleteConfirmModal = function() { document.getElementById('deleteConfirmModal').classList.add('hidden'); itemToDelete = null; deleteType = null; }
-
-        window.toggleView = function(view) {
-             const adminLoginModal = document.getElementById('adminLoginModal');
-             const userView = document.getElementById('userView');
-             const adminView = document.getElementById('adminView');
-             if(view === 'admin') {
-                 if(isAdminLoggedIn) { 
-                     // IMPORTANT: Check role again when switching view to ensure UI is correct
-                     const adminTools = document.getElementById('adminTools');
-                     if (currentUserRole === 'sale') adminTools.classList.add('hidden'); 
-                     else adminTools.classList.remove('hidden');
-                     
-                     userView.classList.add('hidden'); 
-                     adminView.classList.remove('hidden'); 
-                     adminView.classList.add('flex'); 
-                     
-                     window.renderAdminTable();
-                 }
-                 else { adminLoginModal.classList.remove('hidden'); }
-             } else {
-                 if(isAdminLoggedIn) { isAdminLoggedIn = false; }
-                 adminView.classList.add('hidden');
-                 adminView.classList.remove('flex');
-                 userView.classList.remove('hidden');
-             }
-        }
-
-        window.closeLoginModal = function() { 
-            document.getElementById('adminLoginModal').classList.add('hidden');
-            // Clear password on close to prevent peeking
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginError').classList.add('hidden');
-        }
-
-        window.handleAdminLogin = function(e) {
-             e.preventDefault();
-             const u = document.getElementById('loginUsername').value;
-             const p = document.getElementById('loginPassword').value;
-             
-             // Fallback for initial setup if no users exist
-             if(adminUsersList.length === 0 && u === 'admin' && p === '1234') {
-                 // Create default user automatically
-                 const defaultAdmin = { username: 'admin', password: '1234', name: 'System Admin', role: 'admin' };
-                 addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_users'), defaultAdmin).then(() => {
-                      window.showValidationModal('สร้าง User Admin เริ่มต้นสำเร็จ (admin/1234) กรุณา Login ใหม่อีกครั้ง');
-                 });
-                 return;
-             }
-
-             const user = adminUsersList.find(a => a.username === u && a.password === p);
-             if(user) {
-                 isAdminLoggedIn = true;
-                 currentUserRole = user.role;
-                 window.closeLoginModal();
-                 window.toggleView('admin'); // This will trigger the UI update
-                 // Load data
-                 const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), orderBy('createdAt', 'desc'));
-                 onSnapshot(q, (snapshot) => {
-                    requests = [];
-                    snapshot.forEach((doc) => requests.push({ id: doc.id, ...doc.data() }));
-                    window.renderAdminTable(); 
-                 });
-             } else {
-                 document.getElementById('loginError').classList.remove('hidden');
-             }
-        }
-        
-        window.handleLogout = function() {
-            isAdminLoggedIn = false;
-            currentUserRole = null;
-            
-            // Clear login form
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginError').classList.add('hidden');
-
-            // Clear search input
-            const searchInput = document.getElementById('adminSearchInput');
-            if(searchInput) searchInput.value = '';
-
-            window.toggleView('user');
-        }
-
-        window.addToQueue = function() {
-             const nameInput = document.getElementById('inputName');
-             const emailInput = document.getElementById('inputEmail');
-             const merchantIdInput = document.querySelector('input[name="merchantId"]');
-             const merchantNameInput = document.querySelector('input[name="merchantName"]');
-             
-             // Reset styles first
-             nameInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-             emailInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-             merchantIdInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-
-             const name = nameInput.value.trim();
-             const email = emailInput.value.trim();
-             const merchantId = merchantIdInput.value.trim();
-             const merchantName = merchantNameInput.value.trim();
-             
-             if(!merchantId) { 
-                 window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)');
-                 merchantIdInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                 merchantIdInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                 return; 
-             }
-             if(!name || !email) { window.showValidationModal('กรุณากรอกข้อมูลผู้ใช้งานให้ครบถ้วน<br>(Username และ อีเมล)'); return; }
-             
-             // 1. Email Format Check
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                window.showValidationModal('รูปแบบอีเมลไม่ถูกต้อง (เช่น example@domain.com)');
-                emailInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                emailInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                return;
-            }
-
-            // 2. Username No Thai Check
-            const thaiPattern = /[ก-๙]/;
-            if (thaiPattern.test(name)) {
-                window.showValidationModal('Username ห้ามกรอกภาษาไทย');
-                nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                nameInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                return;
-            }
-             
-             const duplicateName = userQueue.some(u => u.fullName.toLowerCase() === name.toLowerCase());
-
-             if (duplicateName) {
-                 document.getElementById('duplicateWarningModal').classList.remove('hidden');
-                 nameInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                 nameInput.addEventListener('input', function() { this.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }, { once: true });
-                 return;
-             }
-
-             let role = 'Custom';
-             const roleRadio = document.querySelector('input[name="role"]:checked');
-             if(roleRadio) role = roleRadio.value;
-             
-             let perms = [];
-             document.querySelectorAll('input[name="permissions"]:checked').forEach(cb => perms.push(parseInt(cb.value)));
-             
-             // Clean permissions
-             let permSet = new Set(perms);
-             const parents = menuItems.filter(m => m.type === 'header');
-             parents.forEach(p => {
-                 const children = menuItems.filter(c => c.parentId === p.id);
-                 if(children.length > 0) {
-                     const hasChild = children.some(c => permSet.has(c.id));
-                     if(!hasChild) permSet.delete(p.id); else permSet.add(p.id);
-                 }
-             });
-             menuItems.forEach(m => { if(m.mandatory) permSet.add(m.id); });
-             
-             userQueue.push({
-                 tempId: Date.now(), 
-                 merchantId: merchantId,
-                 merchantName: merchantName || '-',
-                 fullName: name, 
-                 email: email, 
-                 role: role, 
-                 permissionCount: permSet.size, 
-                 permissions: Array.from(permSet) 
-             });
-             
-             window.renderQueue();
-             document.getElementById('inputName').value = '';
-             document.getElementById('inputEmail').value = '';
-             
-             document.getElementById('queueSection').classList.remove('hidden');
-             
-             // Reset Roles & Permissions (Set clearRoles to true)
-             window.toggleAll(false, true);
-        }
-        
-        window.removeFromQueue = function(id) { userQueue = userQueue.filter(u => u.tempId !== id); window.renderQueue(); }
-        
-        window.resetAll = function() { 
-            userQueue = []; 
-            window.renderQueue(); 
-            window.toggleAll(false, true); 
-            
-            // Clear Merchant Inputs
-            const merchantIdInput = document.querySelector('input[name="merchantId"]');
-            const merchantNameInput = document.querySelector('input[name="merchantName"]');
-            
-            if (merchantIdInput) merchantIdInput.value = '';
-            if (merchantNameInput) merchantNameInput.value = '';
-            
-            document.getElementById('inputName').value = '';
-            document.getElementById('inputEmail').value = '';
-
-            const successMessageEl = document.getElementById('successMessage');
-            if(successMessageEl) {
-                successMessageEl.classList.add('hidden');
-                successMessageEl.classList.remove('flex');
-            }
-        }
-        
-        window.editQueueItem = function(tempId) {
-            const item = userQueue.find(u => u.tempId === tempId);
-            if (!item) return;
-
-            document.getElementById('inputName').value = item.fullName;
-            document.getElementById('inputEmail').value = item.email;
-
-            const roleRadios = document.querySelectorAll('input[name="role"]');
-            let roleMatched = false;
-            roleRadios.forEach(r => {
-                if (r.value === item.role) {
-                    r.checked = true;
-                    roleMatched = true;
-                } else {
-                    r.checked = false;
-                }
-            });
-            
-            if (!roleMatched) {
-                roleRadios.forEach(r => r.checked = false);
-            }
-            
-            const descBox = document.getElementById('roleDescription');
-            if (roleMatched && roleDescriptions[item.role]) {
-                const displayDesc = roleDescriptions[item.role].replace(/\n/g, '<br>');
-                descBox.innerHTML = `<strong><i class="fa-solid fa-circle-info mr-1"></i> ${item.role} Description:</strong><br><div class="mt-1 pl-4 border-l-2 border-brand-200 text-slate-500">${displayDesc}</div>`;
-                descBox.classList.remove('hidden');
-            } else {
-                descBox.classList.add('hidden');
-            }
-
-            window.toggleAll(false, false); 
-            
-            const checkboxes = document.querySelectorAll('input[name="permissions"]');
-            checkboxes.forEach(cb => {
-                const id = parseInt(cb.value);
-                if (item.permissions.includes(id)) {
-                    cb.checked = true;
-                }
-                const menuItem = menuItems.find(m => m.id === id);
-                if (menuItem && menuItem.mandatory) {
-                    cb.checked = true;
-                    cb.disabled = true;
-                }
-            });
-
-            window.removeFromQueue(tempId);
-
-            document.getElementById('inputName').focus();
-            const section = document.getElementById('userInputSection');
-            if(section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                section.classList.add('ring-2', 'ring-brand-400', 'bg-brand-50');
-                setTimeout(() => {
-                    section.classList.remove('ring-2', 'ring-brand-400', 'bg-brand-50');
-                    section.classList.add('bg-brand-50/30');
-                }, 1000);
-            }
-        }
-
-        window.renderQueue = function() {
-             const qBody = document.getElementById('queueListBody');
-             if(!qBody) return;
-             qBody.innerHTML = '';
-             
-             const qSection = document.getElementById('queueSection');
-             const submitBtn = document.getElementById('btnReviewRequest'); // Corrected ID
-             const queueCount = document.getElementById('queueCountDisplay');
-             const footerCount = document.getElementById('footerCount');
-             const nextIndex = document.getElementById('nextUserIndex');
-
-             if(userQueue.length > 0) {
-                 qSection.classList.remove('hidden');
-                 if(submitBtn) {
-                     submitBtn.disabled = false;
-                     submitBtn.innerHTML = `<span>ยืนยันทั้งหมด (${userQueue.length})</span> <i class="fa-solid fa-paper-plane text-sm"></i>`;
-                 }
-             } else {
-                 qSection.classList.add('hidden');
-                 if(submitBtn) {
-                     submitBtn.disabled = true;
-                     submitBtn.innerHTML = `<span>ยืนยันทั้งหมด</span> <i class="fa-solid fa-paper-plane text-sm"></i>`;
-                 }
-             }
-             
-             if(queueCount) queueCount.textContent = userQueue.length;
-             if(footerCount) footerCount.textContent = userQueue.length;
-             if(nextIndex) nextIndex.textContent = userQueue.length + 1;
-
-             userQueue.forEach((u, index) => {
-                 const tr = document.createElement('tr');
-                 tr.className = `user-card-enter bg-white hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0`;
-                 tr.innerHTML = `<td class="px-4 py-2 text-center text-xs text-slate-400 font-mono">${index + 1}</td><td class="px-4 py-2"><div class="font-medium text-slate-800">${u.fullName}</div><div class="text-xs text-slate-400">${u.email}</div></td><td class="px-4 py-2"><span class="inline-block px-2 py-0.5 rounded text-xs border bg-slate-100 text-slate-600 border-slate-200">${u.role}</span></td><td class="px-4 py-2 text-center text-xs text-slate-500">${u.permissionCount} เมนู</td><td class="text-right px-4"><div class="flex items-center justify-end gap-2"><button onclick="window.editQueueItem(${u.tempId})" class="text-brand-400 hover:text-brand-600 p-1.5 hover:bg-brand-50 rounded transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="window.removeFromQueue(${u.tempId})" class="text-red-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded transition-colors"><i class="fa-solid fa-trash-can"></i></button></div></td>`;
-                 qBody.appendChild(tr);
-             });
-             
-             window.updateStats();
-        }
-        
-        window.confirmSubmission = async function() {
-             const merchantId = document.querySelector('input[name="merchantId"]').value;
-             const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
-             const batchId = 'B-' + Date.now();
-
-             if(!merchantId) { window.showValidationModal('กรุณาระบุรหัสร้านค้า (Merchant ID)'); return; }
-             
-             const btn = document.getElementById('btnRealSubmit');
-             const originalBtnContent = btn ? btn.innerHTML : '';
-             if(btn) {
-                 btn.disabled = true;
-                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังส่งข้อมูล...';
-             }
-
-             // --- Firebase Save Logic ---
-             const promises = userQueue.map(u => {
-                 return addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'merchant_requests'), {
-                     ...u, 
-                     merchantId: merchantId,
-                     merchantName: merchantName,
-                     batchId, 
-                     status: 'pending', 
-                     createdAt: serverTimestamp()
-                 });
-             });
-
-             Promise.all(promises).then(() => {
-                 // GChat notification formatting
-                 const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAAAkm33LQY/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=RhINC5xizhv7M6GUjPXEvZ577nDNjE9-JDyNl4cc5HU";
-                 const messageText = `📢 *มีการขอสร้าง User ใหม่ (Merchant Request)*\n🏢 *ร้านค้า:* ${merchantId} - ${merchantName}\n👥 *จำนวน:* ${userQueue.length} User\n🆔 *Case ID:* ${batchId}\n📅 *วันที่:* ${new Date().toLocaleDateString('th-TH')}\n⏳ *สถานะ:* รอดำเนินการ`;
-                 
-                 fetch(webhookUrl, { 
-                     method: 'POST', 
-                     headers: { 'Content-Type': 'application/json; charset=UTF-8' }, 
-                     body: JSON.stringify({ text: messageText }) 
-                 }).catch(err => console.log("ℹ️ ส่งแจ้งเตือน GChat (ข้อมูลส่งไปแล้ว แต่ Browser อ่านค่ากลับไม่ได้):", err.message));
-
-                 window.closePreviewModal();
-                 window.resetAll();
-                 
-                 const successMessageEl = document.getElementById('successMessage');
-                 if(successMessageEl) {
-                     successMessageEl.classList.remove('hidden');
-                     successMessageEl.classList.add('flex');
-                 }
-             }).catch(err => {
-                 console.error("Submission Error:", err);
-                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-             }).finally(() => {
-                 if(btn) {
-                     btn.disabled = false;
-                     btn.innerHTML = originalBtnContent;
-                 }
-             });
-        }
-        
-        window.closeDuplicateWarningModal = function() { document.getElementById('duplicateWarningModal').classList.add('hidden'); }
-        window.closeValidationModal = function() { document.getElementById('validationModal').classList.add('hidden'); }
-        window.showValidationModal = function(msg) { document.getElementById('validationMessage').innerHTML = msg; document.getElementById('validationModal').classList.remove('hidden'); }
-        
-        // --- ADDED MISSING FUNCTIONS FOR DETAIL MODAL ---
-        window.updateUserStatus = function(id, newStatus, currentBatchId) {
-            const userRequest = requests.find(r => r.id === id);
-            const batchUsers = requests.filter(r => r.batchId === currentBatchId);
-            
-            const otherPending = batchUsers.filter(r => r.status === 'pending' && r.id !== id);
-            const isLastPending = otherPending.length === 0;
-
-            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), {
-                status: newStatus
-            }).then(() => {
-                if (newStatus === 'completed' && isLastPending && userRequest) {
-                     const webhookUrl = "https://chat.googleapis.com/v1/spaces/AAAAkm33LQY/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=RhINC5xizhv7M6GUjPXEvZ577nDNjE9-JDyNl4cc5HU";
-                     
-                     let requestDate = '-';
-                     if(userRequest.createdAt) {
-                        const dateObj = userRequest.createdAt.toDate ? userRequest.createdAt.toDate() : new Date(userRequest.createdAt.seconds * 1000);
-                        requestDate = dateObj.toLocaleDateString('th-TH');
-                     }
-
-                     let userDisplay = batchUsers.length === 1 ? `👤 *User:* ${userRequest.fullName}` : `👥 *จำนวน:* ${batchUsers.length} User`;
-
-                     const messageText = `✅ *ดำเนินการเรียบร้อยแล้ว (Completed)*\n🆔 *Case ID:* ${userRequest.batchId}\n${userDisplay}\n🏢 *ร้านค้า:* ${userRequest.merchantId} - ${userRequest.merchantName}\n📅 *วันที่แจ้ง:* ${requestDate}`;
-                     
-                     fetch(webhookUrl, { 
-                         method: 'POST', 
-                         headers: { 'Content-Type': 'application/json; charset=UTF-8' }, 
-                         body: JSON.stringify({ text: messageText }) 
-                     }).catch(err => console.log("ℹ️ ส่งแจ้งเตือนสถานะ GChat (ข้อมูลส่งไปแล้ว แต่ Browser อ่านค่ากลับไม่ได้):", err.message));
-                }
-                window.openDetailModal(currentBatchId);
-            });
-        };
-        
-        window.getPermissionNamesHTML = function(permissionIds) {
-            const selectedIds = permissionIds || [];
-            let html = '<div class="flex flex-col gap-0">';
-            const displayItems = getSortedMenuItems();
-            displayItems.forEach((item, index) => {
-                const isSelected = selectedIds.includes(item.id);
-                const value = isSelected ? 1 : 0;
-                const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
-                let nameStyle = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400';
-                let indentStyle = '';
-                if (item.type === 'header') { nameStyle += ' font-bold'; } else if (item.parentId) { indentStyle = 'pl-4 border-l-2 border-slate-100 ml-1'; }
-                const valClass = isSelected ? 'text-green-600 font-bold' : 'text-slate-300';
-                html += ` <div class="flex justify-between items-center py-1 px-2 ${bgClass} border-b border-slate-100 last:border-0 text-[11px]"> <span class="${nameStyle} ${indentStyle}">${item.name}</span> <span class="${valClass}">${value}</span> </div> `;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        window.openDetailModal = function(batchId) {
-            currentModalBatchId = batchId;
-            const batchUsers = requests.filter(r => r.batchId === batchId);
-            if(batchUsers.length === 0) return;
-            const first = batchUsers[0];
-
-            let displayDate = '-';
-            if(first.createdAt) {
-                 const dateObj = first.createdAt.toDate ? first.createdAt.toDate() : new Date(first.createdAt.seconds * 1000);
-                 displayDate = dateObj.toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-            }
-            
-            document.getElementById('modalMerchantName').textContent = `${first.merchantId} - ${first.merchantName}`;
-            document.getElementById('modalBatchId').textContent = `Batch ID: ${batchId} | Date: ${displayDate}`;
-            const modalTableBody = document.getElementById('modalTableBody');
-            modalTableBody.innerHTML = '';
-            batchUsers.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b border-slate-100 align-top';
-                let statusBadge = '';
-                let actions = '';
-                if (currentUserRole === 'sale') {
-                     if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รอดำเนินการ</span>`; actions = `<span class="text-xs text-slate-400 italic">View Only</span>`; } else if (u.status === 'completed') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">ดำเนินการเรียบร้อยแล้ว</span>`; actions = `<span class="text-xs text-green-600">Completed</span>`; }
-                } else {
-                    if (u.status === 'pending') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">รอดำเนินการ</span>`; actions = ` <button onclick="window.editUser('${u.id}')" class="p-2 text-brand-600 hover:bg-brand-50 rounded" title="แก้ไข"><i class="fa-solid fa-pen"></i></button> <button onclick="window.updateUserStatus('${u.id}', 'completed', '${batchId}')" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs ml-1 shadow-sm">ยืนยันดำเนินการ</button>`; } else if (u.status === 'completed') { statusBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">ดำเนินการเรียบร้อยแล้ว</span>`; actions = `<button onclick="window.updateUserStatus('${u.id}', 'pending', '${batchId}')" class="text-xs text-slate-400 hover:text-red-500 underline ml-2">ยกเลิก</button>`; }
-                }
-                let roleColor = "bg-slate-100 text-slate-600";
-                if(u.role === 'Manager') roleColor = "bg-brand-50 text-brand-700 border border-brand-100";
-                const permListHTML = window.getPermissionNamesHTML(u.permissions);
-                tr.innerHTML = ` 
-                    <td class="px-6 py-4"> <div class="font-medium text-slate-800">${u.fullName}</div> <div class="text-xs text-slate-500">${u.email}</div> </td> <td class="px-6 py-4"> <span class="px-2 py-1 rounded text-xs font-medium ${roleColor}">${u.role}</span> </td> <td class="px-6 py-4"> <div class="flex flex-col items-start gap-1"> <span class="text-xs font-bold text-slate-700">${u.permissionCount} เมนู</span> <button id="perm-btn-${u.id}" onclick="window.togglePerms('${u.id}')" class="text-[10px] text-brand-600 hover:text-brand-800 underline cursor-pointer">แสดงรายการ</button> <div id="perm-list-${u.id}" class="hidden mt-2 p-0 bg-slate-50 rounded border border-slate-200 max-h-64 overflow-y-auto w-full transition-all"> ${permListHTML} </div> </div> </td> <td class="px-6 py-4 text-center"> ${statusBadge} </td> <td class="px-6 py-4 text-right"> <div class="flex justify-end items-center gap-1 h-full">${actions}</div> </td> `; modalTableBody.appendChild(tr);
-            });
-            document.getElementById('detailModal').classList.remove('hidden');
-        }
-
-        window.closeDetailModal = function() { document.getElementById('detailModal').classList.add('hidden'); currentModalBatchId = null; }
-        window.togglePerms = function(id) { const el = document.getElementById(`perm-list-${id}`); if (el.classList.contains('hidden')) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); } }
-        
-        // --- UPDATED EXPORT FUNCTION (MATRIX FORMAT) ---
-        window.exportBatchExcel = function() {
-            if (!currentModalBatchId) return;
-            const batchUsers = requests.filter(r => r.batchId === currentModalBatchId);
-            if (batchUsers.length === 0) return;
-            
-            const firstReq = batchUsers[0];
-            const createdDate = firstReq.createdAt ? new Date(firstReq.createdAt.seconds * 1000).toLocaleDateString('th-TH') : '-';
-
-            // 1. Add BOM for UTF-8 support
-            let csvContent = "\uFEFF";
-            
-            // 2. Merchant Info Header (Matching User's Format)
-            csvContent += `--- Merchant Information ---\n`;
-            csvContent += `Batch ID,${firstReq.batchId}\n`;
-            csvContent += `Date,${createdDate}\n`;
-            csvContent += `Merchant ID,"${firstReq.merchantId || '-'}"\n`;
-            csvContent += `Merchant Name,"${firstReq.merchantName || '-'}"\n`;
-            csvContent += `Total Users,${batchUsers.length}\n\n`;
-
-            // 3. User Details (Transposed)
-            const userNames = batchUsers.map(u => `"${u.fullName}"`).join(",");
-            const roles = batchUsers.map(u => `"${u.role}"`).join(",");
-            const emails = batchUsers.map(u => `"${u.email}"`).join(",");
-            // Phone is not in current form, using placeholder as per requirement
-            const phones = batchUsers.map(u => `"-"`).join(",");
-            
-            csvContent += `--- User Details ---\n`;
-            csvContent += `User Name,${userNames}\n`;
-            csvContent += `Role,${roles}\n`;
-            csvContent += `Email,${emails}\n`;
-            csvContent += `Phone,${phones}\n\n`;
-
-            // 4. Permission Access Matrix
-            csvContent += `--- Permission Access Matrix (1=Selected 0=No) ---\n`;
-            csvContent += `Menu Item List,${userNames}\n`; // Header for matrix columns
-            
-            const sortedMenus = getSortedMenuItems();
-            sortedMenus.forEach(m => {
-                let row = [`"${m.name}"`]; // First column is menu name
-                
-                // Add 1/0 for each user
-                batchUsers.forEach(u => {
-                    const userPerms = cleanPermissions(u.permissions || []);
-                    const hasPerm = userPerms.includes(m.id) ? "1" : "0";
-                    row.push(hasPerm);
-                });
-                
-                csvContent += row.join(",") + "\n";
-            });
-            
-            // 5. Download
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Batch_${currentModalBatchId}_Matrix.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        window.editUser = function(id) { const user = requests.find(r => r.id === id); if (!user) return; document.getElementById('editUserId').value = user.id; document.getElementById('editName').value = user.fullName; document.getElementById('editEmail').value = user.email; const roleRadios = document.querySelectorAll('input[name="editRole"]'); let roleFound = false; roleRadios.forEach(r => { if (r.value === user.role) { r.checked = true; roleFound = true; } }); if(!roleFound) { roleRadios.forEach(r => r.checked = false); } const editCheckboxes = document.querySelectorAll('input[name="editPermissions"]'); editCheckboxes.forEach(cb => { const pid = parseInt(cb.value); cb.checked = user.permissions.includes(pid); const item = menuItems.find(m => m.id === pid); if (item && item.mandatory) { cb.checked = true; } }); document.getElementById('editUserModal').classList.remove('hidden'); }
-        window.closeEditModal = function() { document.getElementById('editUserModal').classList.add('hidden'); }
-        window.saveUserChanges = function() { const id = document.getElementById('editUserId').value; const originalUser = requests.find(r => r.id === id); if (originalUser) { let role = 'Custom'; const roleRadio = document.querySelector('input[name="editRole"]:checked'); if (roleRadio) role = roleRadio.value; let permissions = []; document.querySelectorAll('input[name="editPermissions"]:checked').forEach(cb => { permissions.push(parseInt(cb.value)); }); permissions = cleanPermissions(permissions); const updates = { fullName: document.getElementById('editName').value, email: document.getElementById('editEmail').value, role: role, permissions: permissions, permissionCount: permissions.length }; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'merchant_requests', id), updates).then(() => { window.closeEditModal(); window.openDetailModal(originalUser.batchId); }); } }
-        window.openPreviewModal = function() { 
-            const merchantId = document.querySelector('input[name="merchantId"]').value;
-            const merchantName = document.querySelector('input[name="merchantName"]').value || '-';
-            
-            document.getElementById('previewMerchantId').textContent = merchantId;
-            document.getElementById('previewMerchantName').textContent = merchantName;
-            document.getElementById('previewUserCount').textContent = userQueue.length;
-
-            const previewUserList = document.getElementById('previewUserList');
-            previewUserList.innerHTML = '';
-            
-            const displayItems = getSortedMenuItems();
-            userQueue.forEach((u, index) => { let permListHTML = '<div class="grid grid-cols-1 gap-0 bg-slate-50 p-4 rounded-lg border border-slate-100 max-h-64 overflow-y-auto">'; const displayPermissions = cleanPermissions(u.permissions); displayItems.forEach((item, idx) => { const isSelected = displayPermissions.includes(item.id); const val = isSelected ? 1 : 0; const rowBg = idx % 2 === 0 ? 'bg-white' : ''; let nameClass = isSelected ? 'text-slate-700 font-medium' : 'text-slate-400'; let indentClass = ''; if (item.type === 'header') { nameClass += ' font-bold'; if(isSelected) nameClass += ' text-brand-700'; } else if (item.parentId) { indentClass = 'pl-6 border-l-2 border-slate-100 ml-1.5'; } const valClass = isSelected ? 'text-green-600 font-bold bg-green-50 border-green-200' : 'text-slate-300 bg-slate-100 border-slate-200'; const icon = isSelected && item.type === 'header' ? '<i class="fa-solid fa-folder-open mr-1.5 text-brand-400"></i>' : ''; permListHTML += ` <div class="flex justify-between items-center text-[11px] border-b border-slate-100 py-1.5 px-2 ${rowBg} rounded-sm"> <span class="${nameClass} ${indentClass} flex items-center">${icon}${item.name}</span> <span class="px-2 py-0.5 rounded border ${valClass} min-w-[24px] text-center">${val}</span> </div> `; }); permListHTML += '</div>'; let roleClass = "bg-slate-100 text-slate-600"; if(u.role === 'Manager') roleClass = "bg-brand-100 text-brand-700"; const card = document.createElement('div'); card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"; card.innerHTML = ` <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3"> <div class="flex items-center gap-3"> <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs"> ${index + 1} </div> <div> <div class="font-bold text-slate-800 text-sm">${u.fullName}</div> <div class="text-xs text-slate-500 flex gap-2"> <span><i class="fa-regular fa-envelope"></i> ${u.email}</span> </div> </div> </div> <span class="px-2 py-1 rounded text-xs font-bold ${roleClass}">${u.role}</span> </div> <div> <div class="flex justify-between items-center mb-2"> <div class="text-[10px] uppercase text-slate-400 font-bold">Requested Permissions Matrix</div> <div class="text-[10px] text-slate-400"><span class="font-bold text-green-600">1</span> = Selected, <span class="font-bold text-slate-400">0</span> = No</div> </div> ${permListHTML} </div> `; previewUserList.appendChild(card); }); document.getElementById('previewModal').classList.remove('hidden'); }
-        window.closePreviewModal = function() { document.getElementById('previewModal').classList.add('hidden'); }
-
-        // Initial Renders (FORCE RENDER TO SHOW DEFAULT DATA IMMEDIATELY)
-        window.renderAllRoleUIs();
-        window.renderAllPermissionGrids();
-        
-        // Listeners for Admin Users to allow login
-        onAuthStateChanged(auth, (user) => {
-             if(user) {
-                 // Load Roles
-                 onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'settings_roles', 'default'), (snap) => {
-                     if(snap.exists()) {
-                         const d = snap.data();
-                         if(d.roles) rolePermissions = d.roles;
-                         if(d.descriptions) roleDescriptions = d.descriptions;
-                         window.renderAllRoleUIs();
-                     } else {
-                         // Ensure defaults are saved if first time
-                         window.saveRolesToFirebase();
-                     }
-                 });
-                 // Load Admin Users
-                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'admin_users'), (snap) => {
-                     adminUsersList = [];
-                     snap.forEach(d => adminUsersList.push({id: d.id, ...d.data()}));
-                     // 1. Force table re-render when data updates!
-                     if(typeof window.renderAdminUsersTable === 'function') {
-                         window.renderAdminUsersTable();
-                     }
-                     // Create default admin if empty
-                     if(adminUsersList.length === 0) {
-                         const defaultAdmin = { username: 'admin', password: '1234', name: 'System Admin', role: 'admin' };
-                         addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_users'), defaultAdmin);
-                     }
-                 });
-             }
-        });
-
+    <!-- ═══════════════════════════════════════════════
+     TOAST
+═══════════════════════════════════════════════ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ═══════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════ -->
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Firebase SDK (compat — works in plain HTML/JS without bundler) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js?v=20260310b"></script>
+
+    <script src="js/data.js?v=20260310b"></script>
+    <script src="js/app.js?v=20260310b"></script>
+
+    <script>
+        // Populate dropdowns from (possibly customised) data
+        (function initDropdowns() {
+            refreshTypeDropdown(); // defined in app.js — reads from localStorage or defaults
+            // Role card click handler removed (roles are now per-user dropdowns)
+            // addUserRow() is called from app.js init instead
+        })();
     </script>
+
 </body>
+
 </html>
-
-
-
-
