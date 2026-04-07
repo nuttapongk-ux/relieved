@@ -1,645 +1,93 @@
 <!DOCTYPE html>
-<html lang="th">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Merchant Control – Service Request</title>
-    <meta name="description" content="ระบบส่งคำขอสร้าง User และกำหนด Role สำหรับ Merchant Control" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Control Access Request</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-    <div class="app-layout">
-
-        <!-- ═══════════════════════════════════════════════
-       SIDEBAR
-  ═══════════════════════════════════════════════ -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-mark">
-                    <div class="logo-icon">🏪</div>
-                    <div class="logo-text">
-                        <span class="logo-title">Merchant Control</span>
-                        <span class="logo-sub">SERVICE REQUEST</span>
+    <div class="background-animation"></div>
+    
+    <div class="container">
+        <!-- Request Form Section -->
+        <main class="glass-panel form-section">
+            <header>
+                <h1>Request Access</h1>
+                <p>Submit your details to request user and role access for Merchant Control.</p>
+            </header>
+            
+            <form id="accessRequestForm" class="request-form">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required placeholder="Enter your first name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required placeholder="Enter your last name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" required placeholder="IT, Finance, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="requestedRole">Requested Role</label>
+                    <div class="select-wrapper">
+                        <select id="requestedRole" name="requestedRole" required>
+                            <option value="" disabled selected>Select a role...</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Editor">Editor</option>
+                            <option value="Viewer">Viewer</option>
+                            <option value="Operator">Operator</option>
+                            <option value="Support">Support</option>
+                        </select>
                     </div>
                 </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-section-label">หน้าหลัก</div>
-                <a class="nav-item" data-page="dashboard" onclick="navigateTo('dashboard')" href="#">
-                    <span class="nav-icon">📊</span> ภาพรวมระบบ
-                </a>
-
-                <div class="nav-section-label">คำขอ</div>
-                <a class="nav-item" data-page="new_request" onclick="navigateTo('new_request')" href="#">
-                    <span class="nav-icon">➕</span> ส่งคำขอใหม่
-                </a>
-
-                <div id="management-nav-section" style="display:none">
-                    <div class="nav-section-label">ระบบการจัดการ</div>
-                    <a class="nav-item" data-page="requests" onclick="navigateTo('requests')" href="#">
-                        <span class="nav-icon">📋</span> รายการคำขอของฉัน
-                    </a>
-                    <a class="nav-item" data-page="admin" onclick="navigateTo('admin')" href="#">
-                        <span class="nav-icon">🛡️</span> Admin Panel
-                        <span class="nav-badge" id="pending-badge">0</span>
-                    </a>
-                    <a class="nav-item" data-page="manage_types" onclick="navigateTo('manage_types')" href="#">
-                        <span class="nav-icon">🗂️</span> ประเภทคำขอ
-                    </a>
-                    <a class="nav-item" data-page="manage_menus" onclick="navigateTo('manage_menus')" href="#">
-                        <span class="nav-icon">🔧</span> เมนูสิทธิ์
-                    </a>
-                    <a class="nav-item" data-page="manage_roles" onclick="navigateTo('manage_roles')" href="#">
-                        <span class="nav-icon">🎭</span> Role Default
-                    </a>
+                
+                <div class="form-group full-width">
+                    <label for="justification">Business Justification</label>
+                    <textarea id="justification" name="justification" required placeholder="Briefly explain why you need this access..." rows="3"></textarea>
                 </div>
-            </nav>
+                
+                <div class="form-actions full-width">
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="btn-text">Submit Request</span>
+                        <div class="loader hidden"></div>
+                    </button>
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </form>
+        </main>
 
-            <div class="sidebar-footer">
-                <div class="user-card" id="sidebar-user-card">
-                    <div class="user-avatar" id="sidebar-avatar">👤</div>
-                    <div class="user-info">
-                        <div class="user-name" id="sidebar-user-name">ยังไม่ได้เข้าสู่ระบบ</div>
-                        <div class="user-role" id="sidebar-user-role">
-                            <a href="#" onclick="openLoginModal();return false"
-                                style="color:var(--primary-light);text-decoration:none;font-size:12px">🔑
-                                เข้าสู่ระบบ</a>
-                        </div>
-                    </div>
+        <!-- Dashboard / Request List Section -->
+        <aside class="glass-panel dashboard-section">
+            <header>
+                <h2>Recent Requests</h2>
+                <p>Real-time status of access requests</p>
+                <div class="status-indicator">
+                    <span class="dot pulse"></span> Live
+                </div>
+            </header>
+            
+            <div class="requests-list" id="requestsList">
+                <!-- Requests will be injected here via JS -->
+                <div class="loading-state">
+                    Loading requests...
                 </div>
             </div>
         </aside>
-
-        <!-- ═══════════════════════════════════════════════
-       MAIN CONTENT
-  ═══════════════════════════════════════════════ -->
-        <div class="main-content">
-
-            <!-- Top Bar -->
-            <header class="topbar">
-                <div class="topbar-title" id="topbar-title">📊 ภาพรวมระบบ</div>
-                <div class="topbar-actions">
-                    <div class="btn-icon" title="รีเฟรช"
-                        onclick="renderDashboard();renderRequestList();renderAdminPanel();">🔄</div>
-                    <div class="btn-icon" title="ส่งคำขอใหม่" onclick="navigateTo('new_request')">➕</div>
-                </div>
-            </header>
-
-            <!-- ─────────────── PAGE: DASHBOARD ─────────────── -->
-            <section class="page" id="page-dashboard">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">ภาพรวมระบบ Service Request</div>
-                        <div class="section-sub">สรุปสถานะคำขอทั้งหมดในระบบ Merchant Control</div>
-                    </div>
-                    <button class="btn btn-primary" onclick="navigateTo('new_request')">
-                        ➕ ส่งคำขอใหม่
-                    </button>
-                </div>
-
-                <!-- Stats -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon purple">📋</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="stat-total">0</div>
-                            <div class="stat-label">คำขอทั้งหมด</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon amber">⏳</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="stat-pending">0</div>
-                            <div class="stat-label">รอดำเนินการ</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">✅</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="stat-completed">0</div>
-                            <div class="stat-label">ดำเนินการเรียบร้อยแล้ว</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Requests -->
-                <div class="card">
-                    <div class="flex-between mb-4">
-                        <div style="font-size:16px;font-weight:700">คำขอล่าสุด</div>
-                        <button class="btn btn-outline btn-sm" onclick="navigateTo('requests')">ดูทั้งหมด →</button>
-                    </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Request ID</th>
-                                    <th>ประเภทคำขอ</th>
-                                    <th>ร้านค้า</th>
-                                    <th>สถานะ</th>
-                                    <th>วันที่ส่ง</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-tbody">
-                                <tr>
-                                    <td colspan="5" class="text-center" style="padding:40px;color:var(--text-muted)">
-                                        กำลังโหลด...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ─────────────── PAGE: NEW REQUEST (Multi-Step) ─────────────── -->
-            <section class="page" id="page-new_request">
-
-                <!-- Success State -->
-                <div id="submit-success" class="hidden"
-                    style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
-                    <div style="font-size:72px;margin-bottom:20px">🎉</div>
-                    <h2 style="font-size:26px;font-weight:800;margin-bottom:8px">ส่งคำขอสำเร็จ!</h2>
-                    <p style="color:var(--text-secondary);margin-bottom:8px">คำขอของคุณถูกบันทึกเรียบร้อยแล้ว</p>
-                    <div style="font-family:monospace;font-size:22px;color:var(--primary-light);font-weight:700;background:var(--bg-card);padding:12px 28px;border-radius:12px;border:1px solid var(--border);margin:12px 0"
-                        id="success-req-id"></div>
-                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:28px">
-                        ทีมงานจะดำเนินการและแจ้งผลให้ทราบ</p>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:20px">
-                        <button class="btn btn-primary" onclick="resetForm();clearCountdown()">➕ ส่งคำขอใหม่</button>
-                    </div>
-                    <p style="color:var(--text-muted);font-size:13px">กลับหน้าภาพรวมอัตโนมัติใน <span
-                            id="countdown-seconds" style="font-weight:700;color:var(--primary-light)">10</span> วินาที
-                    </p>
-                </div>
-
-                <!-- Form -->
-                <div id="page-new_request-inner">
-                    <div class="section-header">
-                        <div>
-                            <div class="section-title">ส่งคำขอใหม่</div>
-                            <div class="section-sub">กรอกข้อมูลเพื่อส่งคำขอสร้าง User / กำหนด Role บน Merchant Control
-                            </div>
-                        </div>
-                        <div>
-                            <input type="file" id="import-excel-input" accept=".xlsx,.xls,.csv" style="display:none"
-                                onchange="importExcelFile(this)" />
-                            <button class="btn btn-outline"
-                                onclick="document.getElementById('import-excel-input').click()">
-                                📂 Import Excel
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Step Bar -->
-                    <div class="step-bar">
-                        <div class="step-item active" id="step-item-1">
-                            <div class="step-wrapper" id="step-wrap-1">
-                                <div class="step-circle">1</div>
-                                <div class="step-label">ข้อมูลคำขอ</div>
-                            </div>
-                        </div>
-                        <div class="step-connector"></div>
-                        <div class="step-item" id="step-item-2">
-                            <div class="step-wrapper" id="step-wrap-2">
-                                <div class="step-circle">2</div>
-                                <div class="step-label">ยืนยัน</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <form id="req-form" onsubmit="return false;">
-
-                        <!-- STEP 1: Request Info -->
-                        <div id="form-step-1">
-                            <div class="card mb-6">
-                                <div
-                                    style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--primary-light)">
-                                    📋 ข้อมูลคำขอ</div>
-                                <div class="form-grid">
-                                    <!-- Request Type -->
-                                    <div class="form-group">
-                                        <label class="form-label">ประเภทคำขอ <span class="required">*</span></label>
-                                        <select class="form-control" id="req-type"
-                                            onchange="onReqTypeChange(this.value)">
-                                            <option value="">— เลือกประเภทคำขอ —</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Merchant ID -->
-                                    <div class="form-group">
-                                        <label class="form-label">Merchant ID <span class="required">*</span></label>
-                                        <input class="form-control" type="text" id="req-merchant"
-                                            placeholder="เช่น MCH001" autocomplete="off" />
-                                    </div>
-
-                                    <!-- Merchant Name -->
-                                    <div class="form-group">
-                                        <label class="form-label">Merchant Name <span class="required">*</span></label>
-                                        <input class="form-control" type="text" id="req-merchant-name"
-                                            placeholder="เช่น ร้านค้า ABC สาขาสีลม" />
-                                    </div>
-
-                                    <!-- Multi-User / Revoke-User List -->
-                                    <div class="form-group form-full">
-                                        <div class="flex-between mb-4">
-                                            <label class="form-label" style="font-size:14px" id="users-section-label">
-                                                👤 รายชื่อ User ที่ต้องการ <span class="required">*</span>
-                                            </label>
-                                            <button type="button" class="btn btn-outline btn-sm" id="btn-add-user"
-                                                onclick="addUserRow()">
-                                                ➕ เพิ่ม User
-                                            </button>
-                                        </div>
-                                        <div id="users-container"><!-- rows inserted by JS --></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- STEP 2: Preview & Confirm -->
-                        <div id="form-step-2" class="hidden">
-                            <div class="card mb-6">
-                                <div
-                                    style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--primary-light)">
-                                    ✅ ตรวจสอบข้อมูล</div>
-                                <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
-                                    กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนกดส่งคำขอ</div>
-
-                                <div class="form-grid">
-                                    <div>
-                                        <div class="form-label">ประเภทคำขอ</div>
-                                        <div style="font-weight:600" id="prev-type">—</div>
-                                    </div>
-                                    <div>
-                                        <div class="form-label">Merchant ID</div>
-                                        <div style="font-weight:600" id="prev-merchant">—</div>
-                                    </div>
-                                    <div>
-                                        <div class="form-label">Merchant Name</div>
-                                        <div style="font-weight:600" id="prev-merchant-name">—</div>
-                                    </div>
-
-                                    <div class="form-full">
-                                        <div class="form-label" id="prev-users-label">รายชื่อ User ที่ขอ</div>
-                                        <div id="prev-users">—</div>
-                                    </div>
-                                </div>
-
-                                <div class="divider"></div>
-                                <div
-                                    style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text-secondary);">
-                                    ⚠️ เมื่อกดส่งคำขอแล้ว ระบบจะแจ้งเตือนไปยังทีม Admin เพื่อดำเนินการต่อไป
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form Navigation Buttons -->
-                        <div class="flex gap-2" style="justify-content:flex-end;margin-top:8px">
-                            <button type="button" class="btn btn-outline hidden" id="btn-prev" onclick="prevStep()">←
-                                ย้อนกลับ</button>
-                            <button type="button" class="btn btn-primary" id="btn-next" onclick="nextStep()">ถัดไป
-                                →</button>
-                            <button type="button" class="btn btn-success hidden" id="btn-submit"
-                                onclick="submitRequest()">🚀 ส่งคำขอ</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-            <!-- ─────────────── PAGE: MY REQUESTS ─────────────── -->
-            <section class="page" id="page-requests">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">รายการคำขอ</div>
-                        <div class="section-sub">ติดตามสถานะคำขอทั้งหมด</div>
-                    </div>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap">
-                        <button class="btn btn-outline" onclick="exportAllMatrixExcel()"
-                            title="Export โครงสร้าง Matrix เรียงตามคำขอ">📊
-                            Export Excel (Matrix)</button>
-                        <button class="btn btn-primary" onclick="navigateTo('new_request')">➕ ส่งคำขอใหม่</button>
-                    </div>
-                </div>
-
-                <!-- Filters -->
-                <div class="filter-bar">
-                    <input class="form-control" type="search" id="req-search"
-                        placeholder="🔍 ค้นหา Request ID, ชื่อ..." />
-                    <select class="form-control" id="filter-status">
-                        <option value="">— ทุกสถานะ —</option>
-                        <option value="PENDING">⏳ รอดำเนินการ</option>
-                        <option value="COMPLETED">✅ ดำเนินการเรียบร้อยแล้ว</option>
-                    </select>
-                    <select class="form-control" id="filter-type">
-                        <option value="">— ทุกประเภท —</option>
-                    </select>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Request ID</th>
-                                <th>ประเภท</th>
-                                <th>ร้านค้า</th>
-                                <th>จำนวน User</th>
-                                <th>สถานะ</th>
-                                <th>รายละเอียด</th>
-                            </tr>
-                        </thead>
-                        <tbody id="req-list-tbody">
-                            <tr>
-                                <td colspan="7" class="text-center" style="padding:40px;color:var(--text-muted)">
-                                    กำลังโหลด...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ─────────────── PAGE: ADMIN PANEL ─────────────── -->
-            <section class="page" id="page-admin">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">Admin Panel – อนุมัติคำขอ</div>
-                        <div class="section-sub">ตรวจสอบและดำเนินการกับคำขอที่รอการอนุมัติ</div>
-                    </div>
-                </div>
-                <div id="admin-pending-list">
-                    <!-- Generated by JS -->
-                </div>
-
-                <!-- All Done state shown by JS if empty -->
-            </section>
-
-            <!-- ─────────────── PAGE: MANAGE REQUEST TYPES ─────────────── -->
-            <section class="page" id="page-manage_types">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">🗂️ จัดการประเภทคำขอ</div>
-                        <div class="section-sub">เพิ่ม / แก้ไข / ลบประเภทคำขอที่แสดงในฟอร์มส่งคำขอ</div>
-                    </div>
-                    <button class="btn btn-primary" onclick="showAddTypeForm()">➕ เพิ่มประเภทใหม่</button>
-                </div>
-
-                <!-- Add / Edit form (hidden by default) -->
-                <div class="card mb-6" id="type-form-card" style="display:none">
-                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="type-form-title">➕
-                        เพิ่มประเภทคำขอ</div>
-                    <div class="form-grid" style="max-width:600px">
-                        <div class="form-group">
-                            <label class="form-label">รหัส (ID) <span class="required">*</span></label>
-                            <input class="form-control" id="type-edit-id" placeholder="เช่น CREATE_USER" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ชื่อแสดงผล <span class="required">*</span></label>
-                            <input class="form-control" id="type-edit-label" placeholder="เช่น สร้าง User ใหม่" />
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:10px;margin-top:16px">
-                        <button class="btn btn-primary" onclick="saveTypeForm()">💾 บันทึก</button>
-                        <button class="btn btn-outline" onclick="hideTypeForm()">ยกเลิก</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>รหัส (ID)</th>
-                                    <th>ชื่อแสดงผล</th>
-                                    <th style="text-align:right">การจัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="type-table-body">
-                                <!-- filled by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ─────────────── PAGE: MANAGE PERMISSION MENUS ─────────────── -->
-            <section class="page" id="page-manage_menus">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">🔧 จัดการเมนูสิทธิ์</div>
-                        <div class="section-sub">เพิ่ม / แก้ไข / ลบเมนูที่ใช้กำหนดสิทธิ์ให้ User</div>
-                    </div>
-                    <button class="btn btn-primary" onclick="showAddMenuForm(null)">➕ เพิ่มเมนูหลัก</button>
-                </div>
-
-                <!-- Add / Edit form -->
-                <div class="card mb-6" id="menu-form-card" style="display:none">
-                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="menu-form-title">➕ เพิ่มเมนู
-                    </div>
-                    <div class="form-grid" style="max-width:700px">
-                        <div class="form-group">
-                            <label class="form-label">รหัส (ID) <span class="required">*</span></label>
-                            <input class="form-control" id="menu-edit-id" placeholder="เช่น M28" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ชื่อเมนู <span class="required">*</span></label>
-                            <input class="form-control" id="menu-edit-label" placeholder="ชื่อเมนู" />
-                        </div>
-                    </div>
-                    <input type="hidden" id="menu-edit-parent" value="" />
-                    <input type="hidden" id="menu-edit-orig-id" value="" />
-                    <div style="display:flex;gap:10px;margin-top:16px">
-                        <button class="btn btn-primary" onclick="saveMenuForm()">💾 บันทึก</button>
-                        <button class="btn btn-outline" onclick="hideMenuForm()">ยกเลิก</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div id="menu-tree-list"><!-- filled by JS --></div>
-                </div>
-            </section>
-
-            <!-- ─────────────── PAGE: MANAGE ROLE DEFAULTS ─────────────── -->
-            <section class="page" id="page-manage_roles">
-                <div class="section-header">
-                    <div>
-                        <div class="section-title">🎭 จัดการ Role Default</div>
-                        <div class="section-sub">กำหนด Role และสิทธิ์เมนู ที่จะถูก pre-select อัตโนมัติในแบบฟอร์มส่งคำขอ
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="showAddRoleForm()">➕ เพิ่ม Role</button>
-                </div>
-
-                <!-- Add / Edit form -->
-                <div class="card mb-6" id="role-form-card" style="display:none">
-                    <div style="font-size:15px;font-weight:700;margin-bottom:16px" id="role-form-title">➕ เพิ่ม Role
-                    </div>
-                    <div class="form-grid" style="max-width:700px">
-                        <div class="form-group">
-                            <label class="form-label">รหัส Role (ID) <span class="required">*</span></label>
-                            <input class="form-control" id="role-edit-id" placeholder="เช่น ROLE_CASHIER" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ชื่อแสดงผล <span class="required">*</span></label>
-                            <input class="form-control" id="role-edit-name" placeholder="เช่น Cashier" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">คำอธิบาย</label>
-                            <input class="form-control" id="role-edit-desc" placeholder="คำอธิบายสั้น ๆ" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ระดับสิทธิ์</label>
-                            <select class="form-control" id="role-edit-level">
-                                <option value="high">🔴 High</option>
-                                <option value="medium">🟡 Medium</option>
-                                <option value="low" selected>🟢 Low</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="margin-top:16px">
-                        <label class="form-label" style="margin-bottom:8px;display:block">🔧 สิทธิ์เมนู Default (จะถูก
-                            pre-check เมื่อเลือก Role นี้)</label>
-                        <div id="role-form-perm-panel"></div>
-                    </div>
-                    <input type="hidden" id="role-edit-orig-id" value="" />
-                    <div style="display:flex;gap:10px;margin-top:20px">
-                        <button class="btn btn-primary" onclick="saveRoleForm()">💾 บันทึก</button>
-                        <button class="btn btn-outline" onclick="hideRoleForm()">ยกเลิก</button>
-                    </div>
-                </div>
-
-                <!-- Roles table -->
-                <div class="card">
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Role ID</th>
-                                    <th>ชื่อ</th>
-                                    <th>ระดับ</th>
-                                    <th>Permission Default</th>
-                                    <th>Default</th>
-                                    <th style="text-align:right">การจัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="role-table-body">
-                                <!-- filled by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-        </div><!-- end main-content -->
-    </div><!-- end app-layout -->
-
-    <!-- ═══════════════════════════════════════════════
-     MODAL: Detail View
-═══════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-detail">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">📄 รายละเอียดคำขอ</div>
-                <button class="modal-close" onclick="closeDetailModal()">✕</button>
-            </div>
-            <div class="modal-body" id="modal-detail-body"><!-- filled by JS --></div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeDetailModal()">ปิด</button>
-                <button class="btn btn-primary" onclick="exportDetailMatrixExcel(_currentDetailId)"
-                    style="margin-left:auto">📊
-                    Export Excel</button>
-            </div>
-        </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════
-     MODAL: Reject Reason
-═══════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-reject">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">❌ ปฏิเสธคำขอ</div>
-                <button class="modal-close" onclick="closeRejectModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">เหตุผลที่ปฏิเสธ</label>
-                    <textarea class="form-control" id="reject-reason" rows="4"
-                        placeholder="ระบุเหตุผลในการปฏิเสธ..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeRejectModal()">ยกเลิก</button>
-                <button class="btn btn-danger" onclick="confirmReject()">❌ ยืนยันปฏิเสธ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════
-     MODAL: Login
-═══════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-login">
-        <div class="modal" style="max-width:400px">
-            <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0">
-                <div style="text-align:center;width:100%">
-                    <div style="font-size:48px;margin-bottom:8px">🔐</div>
-                    <div class="modal-title" style="font-size:20px">เข้าสู่ระบบการจัดการ</div>
-                    <p style="color:var(--text-muted);font-size:13px;margin-top:4px">กรุณากรอก Username และ Password</p>
-                </div>
-            </div>
-            <div class="modal-body" style="padding-top:12px">
-                <div class="form-group" style="margin-bottom:14px">
-                    <label class="form-label">Username</label>
-                    <input class="form-control" type="text" id="login-username" placeholder="admin"
-                        autocomplete="username" />
-                </div>
-                <div class="form-group" style="margin-bottom:6px">
-                    <label class="form-label">Password</label>
-                    <input class="form-control" type="password" id="login-password" placeholder="••••••••"
-                        autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
-                </div>
-                <div id="login-error"
-                    style="color:var(--danger);font-size:13px;min-height:20px;margin-top:6px;text-align:center"></div>
-            </div>
-            <div class="modal-footer" style="border-top:none;justify-content:center;padding-top:0">
-                <button class="btn btn-outline" onclick="closeLoginModal()">ยกเลิก</button>
-                <button class="btn btn-primary" onclick="doLogin()" style="min-width:120px">🔑 เข้าสู่ระบบ</button>
-            </div>
-        </div>
-    </div>
-    <!-- ═══════════════════════════════════════════════
-     TOAST
-═══════════════════════════════════════════════ -->
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- ═══════════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════════ -->
-    <!-- SheetJS for Excel export -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-
-    <!-- Firebase SDK (compat — works in plain HTML/JS without bundler) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="js/firebase.js?v=20260327"></script>
-
-    <script src="js/data.js?v=20260327"></script>
-    <script src="js/app.js?v=20260327"></script>
-
-    <script>
-        // Populate dropdowns from (possibly customised) data
-        (function initDropdowns() {
-            refreshTypeDropdown(); // defined in app.js — reads from localStorage or defaults
-            // Role card click handler removed (roles are now per-user dropdowns)
-            // addUserRow() is called from app.js init instead
-        })();
-    </script>
-
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script type="module" src="app.js"></script>
 </body>
-
 </html>
